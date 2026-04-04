@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMK Controller</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:           #080a0d;
+            --surface:      #0e1117;
+            --surface-2:    #161b24;
+            --border:       rgba(255,255,255,0.07);
+            --border-strong:rgba(255,255,255,0.14);
+            --text:         #e8eaf0;
+            --text-muted:   #6b7280;
+            --text-dim:     #2e3748;
+            --accent:       #3b82f6;
+            --green:        #22c55e;
+            --red:          #ef4444;
+            --amber:        #f59e0b;
+        }
+
+        html, body { min-height: 100%; }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background orb */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            transition: background 0.8s ease;
+            background:
+                radial-gradient(ellipse 60% 40% at 50% -10%, rgba(59,130,246,0.09) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 80% 110%, rgba(34,197,94,0.05) 0%, transparent 60%);
+        }
+
+        body.mode-gamer::before {
+            background:
+                radial-gradient(ellipse 60% 40% at 50% -10%, rgba(239,68,68,0.11) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 20% 110%, rgba(239,68,68,0.06) 0%, transparent 60%);
+        }
+
+        body.mode-stable::before {
+            background:
+                radial-gradient(ellipse 60% 40% at 50% -10%, rgba(34,197,94,0.10) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 80% 110%, rgba(34,197,94,0.05) 0%, transparent 60%);
+        }
+
+        body.mode-normal::before {
+            background:
+                radial-gradient(ellipse 60% 40% at 50% -10%, rgba(59,130,246,0.10) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 80% 110%, rgba(59,130,246,0.05) 0%, transparent 60%);
+        }
+
+        /* Header */
+        header {
+            position: relative; z-index: 1;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(14,17,23,0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .logo-group { display: flex; align-items: center; gap: 12px; }
+
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.35);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 12px rgba(59,130,246,0.22), inset 0 0 8px rgba(59,130,246,0.06);
+            animation: logo-breathe 3s ease-in-out infinite;
+        }
+
+        @keyframes logo-breathe {
+            0%,100% { box-shadow: 0 0 12px rgba(59,130,246,0.22), inset 0 0 8px rgba(59,130,246,0.06); }
+            50%      { box-shadow: 0 0 22px rgba(59,130,246,0.40), inset 0 0 14px rgba(59,130,246,0.14); }
+        }
+
+        .logo-icon svg { width: 18px; height: 18px; }
+        .logo-text { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+        .logo-sub  { font-size: 11px; color: var(--text-muted); margin-top: 1px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.04em; }
+
+        .version-badge {
+            font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+            color: var(--text-muted); background: var(--surface-2);
+            border: 1px solid var(--border); padding: 4px 10px; border-radius: 99px;
+        }
+
+        /* Main */
+        main { position: relative; z-index: 1; padding: 24px; max-width: 520px; margin: 0 auto; }
+
+        /* Status bar */
+        .status-bar {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px 16px;
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 24px;
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+
+        .status-bar.glow-green { border-color: rgba(34,197,94,0.32);  box-shadow: 0 0 18px rgba(34,197,94,0.12); }
+        .status-bar.glow-red   { border-color: rgba(239,68,68,0.32);  box-shadow: 0 0 18px rgba(239,68,68,0.12); }
+        .status-bar.glow-blue  { border-color: rgba(59,130,246,0.32); box-shadow: 0 0 18px rgba(59,130,246,0.12); }
+
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--green); box-shadow: 0 0 7px var(--green);
+            flex-shrink: 0;
+            transition: background 0.4s, box-shadow 0.4s;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { transform: scale(1);    opacity: 1; }
+            50%      { transform: scale(1.35); opacity: 0.55; }
+        }
+
+        .status-label { font-size: 12px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+        .status-value { font-size: 12px; color: var(--text); font-family: 'IBM Plex Mono', monospace; margin-left: auto; transition: color 0.4s; }
+
+        /* Section header */
+        .section-title {
+            font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+            color: var(--text-muted); text-transform: uppercase;
+            margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* Mode cards */
+        .modes { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+
+        .mode-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px 18px;
+            cursor: pointer; display: flex; align-items: center; gap: 14px;
+            transition: border-color 0.35s, background 0.35s, box-shadow 0.45s, transform 0.18s;
+            -webkit-tap-highlight-color: transparent; user-select: none;
+            position: relative; overflow: hidden; will-change: transform;
+        }
+
+        /* Shine sweep */
+        .mode-card::after {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 55%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.045), transparent);
+            transform: skewX(-18deg); pointer-events: none;
+        }
+
+        .mode-card.shine::after { animation: card-shine 0.45s ease forwards; }
+
+        @keyframes card-shine {
+            from { left: -100%; }
+            to   { left: 160%;  }
+        }
+
+        .mode-card.selected-gamer {
+            border-color: rgba(239,68,68,0.55);
+            background: rgba(239,68,68,0.055);
+            box-shadow:
+                0 0 0 1px rgba(239,68,68,0.14),
+                0 0 22px rgba(239,68,68,0.24),
+                0 0 65px rgba(239,68,68,0.08),
+                inset 0 0 28px rgba(239,68,68,0.04);
+        }
+
+        .mode-card.selected-stable {
+            border-color: rgba(34,197,94,0.55);
+            background: rgba(34,197,94,0.055);
+            box-shadow:
+                0 0 0 1px rgba(34,197,94,0.14),
+                0 0 22px rgba(34,197,94,0.24),
+                0 0 65px rgba(34,197,94,0.08),
+                inset 0 0 28px rgba(34,197,94,0.04);
+        }
+
+        .mode-card.selected-normal {
+            border-color: rgba(59,130,246,0.55);
+            background: rgba(59,130,246,0.055);
+            box-shadow:
+                0 0 0 1px rgba(59,130,246,0.14),
+                0 0 22px rgba(59,130,246,0.24),
+                0 0 65px rgba(59,130,246,0.08),
+                inset 0 0 28px rgba(59,130,246,0.04);
+        }
+
+        /* Ripple */
+        .ripple {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            transform: scale(0); animation: ripple-out 0.55s ease-out forwards;
+        }
+
+        @keyframes ripple-out { to { transform: scale(6); opacity: 0; } }
+
+        /* Bounce pop */
+        .mode-card.pop { animation: card-pop 0.32s cubic-bezier(0.34,1.56,0.64,1); }
+
+        @keyframes card-pop {
+            0%   { transform: scale(0.97); }
+            60%  { transform: scale(1.015); }
+            100% { transform: scale(1); }
+        }
+
+        /* Icon */
+        .mode-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            transition: box-shadow 0.45s, transform 0.25s;
+        }
+
+        .mode-icon.gamer  { background: rgba(239,68,68,0.12); }
+        .mode-icon.stable { background: rgba(34,197,94,0.12); }
+        .mode-icon.normal { background: rgba(59,130,246,0.12); }
+
+        .selected-gamer .mode-icon.gamer   { box-shadow: 0 0 16px rgba(239,68,68,0.6);  transform: scale(1.1); }
+        .selected-stable .mode-icon.stable { box-shadow: 0 0 16px rgba(34,197,94,0.6);  transform: scale(1.1); }
+        .selected-normal .mode-icon.normal { box-shadow: 0 0 16px rgba(59,130,246,0.6); transform: scale(1.1); }
+
+        .mode-info { flex: 1; }
+        .mode-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .mode-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Radio indicator */
+        .mode-indicator {
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 1.5px solid var(--border-strong); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: border-color 0.3s, background 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+
+        .mode-indicator.active      { border-color: var(--green);  background: var(--green);  box-shadow: 0 0 10px rgba(34,197,94,0.75);  transform: scale(1.12); }
+        .mode-indicator.active-red  { border-color: var(--red);    background: var(--red);    box-shadow: 0 0 10px rgba(239,68,68,0.75);  transform: scale(1.12); }
+        .mode-indicator.active-blue { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 10px rgba(59,130,246,0.75); transform: scale(1.12); }
+
+        .mode-indicator svg { width: 10px; height: 10px; opacity: 0; transition: opacity 0.2s 0.06s; }
+        .mode-indicator.active svg,
+        .mode-indicator.active-red svg,
+        .mode-indicator.active-blue svg { opacity: 1; }
+
+        /* Values grid */
+        .values-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 28px; }
+
+        .val-cell {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 4px; text-align: center;
+            transition: border-color 0.4s, box-shadow 0.4s;
+        }
+
+        .val-cell.flash-green { animation: flash-green 0.55s ease; }
+        .val-cell.flash-red   { animation: flash-red   0.55s ease; }
+        .val-cell.flash-blue  { animation: flash-blue  0.55s ease; }
+
+        @keyframes flash-green { 0% { border-color: rgba(34,197,94,0.75);  box-shadow: 0 0 12px rgba(34,197,94,0.45); } 100% { border-color: var(--border); box-shadow: none; } }
+        @keyframes flash-red   { 0% { border-color: rgba(239,68,68,0.75);  box-shadow: 0 0 12px rgba(239,68,68,0.45); } 100% { border-color: var(--border); box-shadow: none; } }
+        @keyframes flash-blue  { 0% { border-color: rgba(59,130,246,0.75); box-shadow: 0 0 12px rgba(59,130,246,0.45); } 100% { border-color: var(--border); box-shadow: none; } }
+
+        .val-label { font-size: 9px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 4px; letter-spacing: 0.03em; }
+
+        .val-num {
+            font-size: 11px; font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: var(--text);
+        }
+
+        .val-num.pop-in { animation: val-pop 0.22s cubic-bezier(0.34,1.56,0.64,1); }
+
+        @keyframes val-pop {
+            0%   { transform: scale(0.7) translateY(4px); opacity: 0; }
+            100% { transform: scale(1)   translateY(0);   opacity: 1; }
+        }
+
+        /* Apply button */
+        .apply-btn {
+            width: 100%; padding: 15px;
+            background: var(--accent); color: #fff; border: none; border-radius: 10px;
+            font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 500;
+            cursor: pointer; letter-spacing: 0.01em; margin-bottom: 24px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 22px rgba(59,130,246,0.32);
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.35s, background 0.35s;
+        }
+
+        .apply-btn::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.13) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        .apply-btn:hover:not(:disabled) { box-shadow: 0 0 36px rgba(59,130,246,0.50); }
+        .apply-btn:active:not(:disabled) { transform: scale(0.97); box-shadow: 0 0 12px rgba(59,130,246,0.22); }
+        .apply-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .apply-btn.success  { background: var(--green); box-shadow: 0 0 30px rgba(34,197,94,0.45); }
+
+        .btn-ripple {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            background: rgba(255,255,255,0.22);
+            transform: scale(0); animation: ripple-out 0.5s ease-out forwards;
+        }
+
+        /* Log */
+        .log-box {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; overflow: hidden;
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+
+        .log-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px; border-bottom: 1px solid var(--border);
+        }
+
+        .log-header-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .log-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+
+        #log { padding: 12px 14px; min-height: 80px; max-height: 160px; overflow-y: auto; }
+
+        .log-line {
+            font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.8;
+            display: flex; gap: 10px;
+            animation: log-slide 0.2s ease;
+        }
+
+        @keyframes log-slide {
+            from { transform: translateX(-8px); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
+
+        .log-time { color: var(--text-dim); flex-shrink: 0; }
+        .log-msg  { color: var(--text-muted); }
+        .log-msg.ok   { color: var(--green); }
+        .log-msg.warn { color: var(--amber); }
+        .log-msg.err  { color: var(--red);   }
+
+        /* Footer */
+        footer { position: relative; z-index: 1; text-align: center; padding: 20px 24px; font-size: 11px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="mode-stable">
+
+<header>
+    <div class="logo-group">
+        <div class="logo-icon">
+            <svg viewBox="0 0 18 18" fill="none">
+                <rect x="2" y="2" width="6" height="6" rx="1.5" fill="#3b82f6"/>
+                <rect x="10" y="2" width="6" height="6" rx="1.5" fill="#3b82f6" opacity="0.5"/>
+                <rect x="2" y="10" width="6" height="6" rx="1.5" fill="#3b82f6" opacity="0.5"/>
+                <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#3b82f6" opacity="0.3"/>
+            </svg>
+        </div>
+        <div>
+            <div class="logo-text">LMK Controller</div>
+            <div class="logo-sub">by feerd</div>
+        </div>
+    </div>
+    <div class="version-badge">v1.0</div>
+</header>
+
+<main>
+
+    <div class="status-bar glow-green" id="statusBar">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-label">Active mode</span>
+        <span class="status-value" id="statusMode">STABILITY</span>
+    </div>
+
+    <div class="section-title">Select Mode</div>
+
+    <div class="modes">
+
+        <div class="mode-card" id="card-gamer" onclick="selectMode('gamer',event)">
+            <div class="mode-icon gamer">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 3L13 8H17L14 12L15.5 17L10 14L4.5 17L6 12L3 8H7L10 3Z" fill="#ef4444"/>
+                </svg>
+            </div>
+            <div class="mode-info">
+                <div class="mode-name">Performance</div>
+                <div class="mode-desc">All minfree thresholds set to 0. Maximum RAM for the foreground app.</div>
+            </div>
+            <div class="mode-indicator" id="ind-gamer">
+                <svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.5 7.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </div>
+
+        <div class="mode-card selected-stable" id="card-stable" onclick="selectMode('stable',event)">
+            <div class="mode-icon stable">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 3C10 3 4 6 4 11C4 14.3 6.7 17 10 17C13.3 17 16 14.3 16 11C16 6 10 3 10 3Z" fill="#22c55e" opacity="0.9"/>
+                    <path d="M10 8V12M8 10H12" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="mode-info">
+                <div class="mode-name">Stability</div>
+                <div class="mode-desc">Balanced thresholds (1024–16384 pages). Best for daily use and multitasking.</div>
+            </div>
+            <div class="mode-indicator active" id="ind-stable">
+                <svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.5 7.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </div>
+
+        <div class="mode-card" id="card-normal" onclick="selectMode('normal',event)">
+            <div class="mode-icon normal">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="6" stroke="#3b82f6" stroke-width="1.8"/>
+                    <path d="M7 10H13M10 7V13" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="mode-info">
+                <div class="mode-name">Default</div>
+                <div class="mode-desc">Stock Android LMK values restored. Closest to OEM baseline behaviour.</div>
+            </div>
+            <div class="mode-indicator" id="ind-normal">
+                <svg viewBox="0 0 10 10" fill="none"><path d="M2 5L4.5 7.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">minfree thresholds (pages)</div>
+    <div class="values-grid" id="valuesGrid">
+        <div class="val-cell"><div class="val-label">FORE</div><div class="val-num" id="v0">1024</div></div>
+        <div class="val-cell"><div class="val-label">VIS</div><div class="val-num" id="v1">2048</div></div>
+        <div class="val-cell"><div class="val-label">SEC</div><div class="val-num" id="v2">4096</div></div>
+        <div class="val-cell"><div class="val-label">HID</div><div class="val-num" id="v3">8192</div></div>
+        <div class="val-cell"><div class="val-label">CONT</div><div class="val-num" id="v4">12288</div></div>
+        <div class="val-cell"><div class="val-label">EMPTY</div><div class="val-num" id="v5">16384</div></div>
+    </div>
+
+    <button class="apply-btn" id="applyBtn" onclick="applyMode(event)">Apply Settings</button>
+
+    <div class="log-box" id="logBox">
+        <div class="log-header">
+            <div class="log-dot"></div>
+            <div class="log-header-title">Shell Output</div>
+        </div>
+        <div id="log">
+            <div class="log-line">
+                <span class="log-time">00:00:00</span>
+                <span class="log-msg ok">Module initialised — boot script applied.</span>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer>LMK Controller v1.0 &nbsp;/&nbsp; Low Memory Killer Optimizer</footer>
+
+<script>
+    const MODES = {
+        gamer:  { values:[0,0,0,0,0,0],                    label:'PERFORMANCE', bodyClass:'mode-gamer',  statusClass:'glow-red',   dotColor:'#ef4444', dotGlow:'0 0 8px #ef4444', indClass:'active-red'  },
+        stable: { values:[1024,2048,4096,8192,12288,16384], label:'STABILITY',   bodyClass:'mode-stable', statusClass:'glow-green',  dotColor:'#22c55e', dotGlow:'0 0 8px #22c55e', indClass:'active'      },
+        normal: { values:[4096,5120,6144,7168,8192,9216],   label:'DEFAULT',     bodyClass:'mode-normal', statusClass:'glow-blue',   dotColor:'#3b82f6', dotGlow:'0 0 8px #3b82f6', indClass:'active-blue' },
+    };
+
+    const CMDS = {
+        gamer:  "echo 0,0,0,0,0,0 > /sys/module/lowmemorykiller/parameters/minfree && setprop sys.lmk.minfree_levels 0:0,0:0,0:0,0:0,0:0,0:0",
+        stable: "echo 1024,2048,4096,8192,12288,16384 > /sys/module/lowmemorykiller/parameters/minfree && setprop ro.lmk.low 1001 && setprop sys.lmk.minfree_levels 1024:0,2048:100,4096:200,8192:250,12288:900,16384:950",
+        normal: "echo 4096,5120,6144,7168,8192,9216 > /sys/module/lowmemorykiller/parameters/minfree",
+    };
+
+    const FLASH_CLASS = { gamer:'flash-red', stable:'flash-green', normal:'flash-blue' };
+    let currentMode = 'stable';
+
+    function now() { return new Date().toTimeString().slice(0,8); }
+
+    function addRipple(el, e, color) {
+        const r = el.getBoundingClientRect();
+        const size = Math.max(r.width, r.height);
+        const rip = document.createElement('span');
+        rip.className = el.tagName === 'BUTTON' ? 'btn-ripple' : 'ripple';
+        rip.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-r.left-size/2}px;top:${e.clientY-r.top-size/2}px;background:${color};`;
+        el.appendChild(rip);
+        rip.addEventListener('animationend', () => rip.remove());
+    }
+
+    function appendLog(msg, cls='') {
+        const el = document.getElementById('log');
+        const line = document.createElement('div');
+        line.className = 'log-line';
+        line.innerHTML = `<span class="log-time">${now()}</span><span class="log-msg ${cls}">${msg}</span>`;
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+    }
+
+    function selectMode(mode, e) {
+        if (mode === currentMode) return;
+        currentMode = mode;
+        const m = MODES[mode];
+
+        // Body ambient glow
+        document.body.className = m.bodyClass;
+
+        // Reset all cards + indicators
+        ['gamer','stable','normal'].forEach(k => {
+            document.getElementById('card-'+k).className = 'mode-card';
+            document.getElementById('ind-'+k).className  = 'mode-indicator';
+        });
+
+        // Activate selected card
+        const card = document.getElementById('card-'+mode);
+        card.className = 'mode-card selected-'+mode;
+
+        if (e) {
+            const ripColors = { gamer:'rgba(239,68,68,0.2)', stable:'rgba(34,197,94,0.18)', normal:'rgba(59,130,246,0.18)' };
+            addRipple(card, e, ripColors[mode]);
+        }
+
+        // Shine + bounce
+        void card.offsetWidth;
+        card.classList.add('shine');
+        card.addEventListener('animationend', () => card.classList.remove('shine'), {once:true});
+        card.classList.add('pop');
+        card.addEventListener('animationend', () => card.classList.remove('pop'), {once:true});
+
+        // Indicator
+        document.getElementById('ind-'+mode).className = 'mode-indicator ' + m.indClass;
+
+        // Status bar
+        document.getElementById('statusBar').className = 'status-bar ' + m.statusClass;
+        document.getElementById('statusMode').textContent = m.label;
+
+        // Dot
+        const dot = document.getElementById('statusDot');
+        dot.style.background = m.dotColor;
+        dot.style.boxShadow  = m.dotGlow;
+
+        // Values with staggered pop
+        const flashCls = FLASH_CLASS[mode];
+        const cells = document.querySelectorAll('.val-cell');
+        m.values.forEach((v, i) => {
+            setTimeout(() => {
+                document.getElementById('v'+i).textContent = v;
+                // pop-in
+                const num = document.getElementById('v'+i);
+                num.classList.remove('pop-in');
+                void num.offsetWidth;
+                num.classList.add('pop-in');
+                num.addEventListener('animationend', () => num.classList.remove('pop-in'), {once:true});
+                // cell flash
+                cells[i].classList.remove('flash-red','flash-green','flash-blue');
+                void cells[i].offsetWidth;
+                cells[i].classList.add(flashCls);
+                cells[i].addEventListener('animationend', () => cells[i].classList.remove(flashCls), {once:true});
+            }, i * 45);
+        });
+
+        appendLog(`Mode selected \u2192 ${m.label}`);
+    }
+
+    const CONFIG_PATH = '/data/adb/modules/lmk_controller_feerd/lmk_mode';
+
+    function applyMode(e) {
+        const btn = document.getElementById('applyBtn');
+        const m   = MODES[currentMode];
+        // Apply LMK values (may fail on non-classic kernels — that's ok)
+        const cmd     = "su -c '" + CMDS[currentMode] + "'";
+        // Save chosen mode separately so it ALWAYS persists even if LMK write fails
+        const saveCmd = "su -c 'echo " + currentMode + " > " + CONFIG_PATH + "'";
+
+        if (e) addRipple(btn, e, 'rgba(255,255,255,0.22)');
+
+        btn.disabled = true;
+        btn.textContent = 'Applying\u2026';
+        appendLog('Executing: ' + CMDS[currentMode].slice(0,50) + '\u2026', 'warn');
+
+        if (typeof ksu !== 'undefined' && ksu.exec) {
+            try {
+                ksu.exec(cmd);
+                ksu.exec(saveCmd);
+                appendLog('Mode saved \u2192 will auto-apply on reboot.', 'ok');
+                showSuccess(btn, m.label);
+            } catch(err) {
+                appendLog('Execution error: ' + err.message, 'err');
+                resetBtn(btn);
+            }
+        } else {
+            console.log('[LMK]', cmd);
+            setTimeout(() => showSuccess(btn, m.label + ' (dev preview)'), 700);
+        }
+    }
+
+    function showSuccess(btn, label) {
+        appendLog('Settings applied \u2014 mode: ' + label, 'ok');
+        btn.textContent = '\u2713 Applied';
+        btn.classList.add('success');
+        setTimeout(() => { btn.classList.remove('success'); resetBtn(btn); }, 1800);
+    }
+
+    function resetBtn(btn) { btn.disabled = false; btn.textContent = 'Apply Settings'; }
+
+    // On page load: restore the last saved mode from the config file
+    function init() {
+        if (typeof ksu !== 'undefined' && ksu.exec) {
+            try {
+                const saved = ksu.exec("su -c 'cat " + CONFIG_PATH + " 2>/dev/null'").trim();
+                if (['gamer','stable','normal'].includes(saved) && saved !== currentMode) {
+                    selectMode(saved, null);
+                    appendLog('Saved mode restored \u2192 ' + MODES[saved].label, 'ok');
+                }
+            } catch(e) { /* config not written yet, keep default */ }
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
