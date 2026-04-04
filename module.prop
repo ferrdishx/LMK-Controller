@@ -1,0 +1,6 @@
+id=lmk_controller_feerd
+name=LMK Controller
+version=v1.0
+versionCode=1
+author=feerd
+description=Total control over Low Memory Killer. Modes: Gamer, Stable, and Normal.
