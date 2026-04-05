@@ -51,10 +51,24 @@ The **Low Memory Killer** is a kernel mechanism that frees RAM by terminating ba
 
 - Android 8.0+
 - [Magisk](https://github.com/topjohnwu/Magisk) 20.4+ or [KernelSU](https://github.com/tiann/KernelSU)
-- [MMRL](https://github.com/DerGoogler/MMRL) or [WebUIKSU](https://github.com/adivenxnataly/KsuWebUI)
+- [MMRL](https://github.com/DerGoogler/MMRL) or compatible module manager
 - Kernel with classic LMK node: `/sys/module/lowmemorykiller/parameters/minfree`
 
 > ⚠️ Devices running **LMKD** (userspace LMK, common on Android 10+ with newer kernels) are not supported.
+
+### How to check if your device is compatible
+
+Open Termux and run:
+
+```sh
+# If this file exists → classic LMK → ✅ supported
+ls /sys/module/lowmemorykiller/parameters/minfree
+
+# If this returns "true" → LMKD → ❌ not supported
+getprop ro.lmk.use_minfree_levels
+```
+
+The module detects this automatically during installation and warns you.
 
 ---
 
