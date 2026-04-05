@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LMK Controller — Full Control Over Android's Memory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #F5F5F7;
+      --white:     #FFFFFF;
+      --black:     #000000;
+      --t1:        #1d1d1f;
+      --t2:        #6e6e73;
+      --t3:        #aeaeb2;
+      --border:    rgba(0,0,0,0.1);
+      --blue:      #0071e3;
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: rgba(0,113,227,0.15); }
+
+    /* ── Scrollbar ─────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 3px; }
+
+    /* ── NAV ───────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 52px;
+      background: rgba(245,245,247,0.82);
+      backdrop-filter: saturate(180%) blur(24px);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center;
+    }
+    .nav-inner {
+      max-width: 1080px; margin: 0 auto; padding: 0 28px;
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 9px;
+      text-decoration: none; color: var(--t1);
+    }
+    .nav-logo-mark {
+      width: 24px; height: 24px; background: var(--black);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-text { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a {
+      font-size: 13px; font-weight: 500; color: var(--t2);
+      text-decoration: none; transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--t1); }
+    .nav-gh {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--white); border: 0.5px solid rgba(0,0,0,0.14);
+      border-radius: 980px; padding: 7px 15px;
+      font-size: 13px; font-weight: 500; color: var(--t1);
+      text-decoration: none; transition: box-shadow 0.22s ease, transform 0.22s ease;
+    }
+    .nav-gh:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-1px); }
+
+    /* ── HERO ──────────────────────────────── */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 100px 28px 80px;
+      overflow: hidden;
+    }
+    #three-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 700px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--white); border: 0.5px solid rgba(0,0,0,0.12);
+      border-radius: 980px; padding: 6px 16px;
+      font-size: 13px; font-weight: 500; color: var(--t2);
+      margin-bottom: 36px;
+    }
+    .hero-badge-dot {
+      display: inline-block; width: 7px; height: 7px;
+      background: #34c759; border-radius: 50%;
+    }
+
+    .hero-title {
+      font-size: clamp(56px, 10vw, 96px);
+      font-weight: 800; line-height: 0.96;
+      letter-spacing: -0.04em;
+      color: var(--t1); margin-bottom: 22px;
+    }
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 22px);
+      font-weight: 400; color: var(--t2);
+      line-height: 1.45; margin-bottom: 12px;
+    }
+    .hero-desc {
+      font-size: 16px; color: var(--t3);
+      line-height: 1.65; max-width: 440px;
+      margin: 0 auto 44px;
+    }
+    .hero-actions {
+      display: flex; align-items: center; justify-content: center;
+      gap: 18px; flex-wrap: wrap;
+    }
+
+    /* ── BUTTONS ───────────────────────────── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--black); color: #fff;
+      font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+      padding: 13px 26px; border-radius: 980px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+    .btn-primary:hover {
+      background: #1a1a1a; transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+    }
+    .btn-primary:active { transform: translateY(0); box-shadow: none; }
+
+    .btn-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      color: var(--blue); font-size: 15px; font-weight: 500;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .btn-link:hover { opacity: 0.72; }
+    .btn-link svg { transition: transform 0.2s; }
+    .btn-link:hover svg { transform: translateX(4px); }
+
+    /* ── SCROLL HINT ───────────────────────── */
+    .scroll-hint {
+      position: absolute; bottom: 36px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      z-index: 1; animation: scrollBounce 2.4s ease-in-out infinite;
+    }
+    .scroll-hint span {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--t3); font-weight: 500;
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+      50% { transform: translateX(-50%) translateY(7px); opacity: 1; }
+    }
+
+    /* ── SECTIONS SHARED ───────────────────── */
+    .section-inner { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+    .section-tag {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--t3); margin-bottom: 14px;
+    }
+    .section-heading {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700; letter-spacing: -0.03em;
+      color: var(--t1); line-height: 1.1; margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--t2);
+      line-height: 1.55; max-width: 460px;
+    }
+    hr.divider {
+      border: none; border-top: 0.5px solid var(--border); margin: 0;
+    }
+
+    /* ── STATES SECTION ────────────────────── */
+    #states { background: var(--white); padding: 96px 28px; }
+    .states-header { text-align: center; margin-bottom: 60px; }
+    .states-header .section-sub { margin: 0 auto; }
+    .states-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .state-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      padding: 32px 26px;
+      transition: transform 0.26s ease, box-shadow 0.26s ease;
+      position: relative; overflow: hidden;
+    }
+    .state-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 52px rgba(0,0,0,0.09);
+    }
+    .state-card.featured {
+      background: var(--white);
+      border: 1.5px solid var(--black);
+    }
+    .state-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 980px; padding: 5px 12px; margin-bottom: 24px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.03em;
+    }
+    .badge-dark { background: var(--black); color: #fff; }
+    .badge-light { background: var(--white); border: 0.5px solid rgba(0,0,0,0.12); color: var(--t1); }
+    .badge-muted { background: rgba(0,0,0,0.05); color: var(--t2); }
+    .state-recommended {
+      font-size: 11px; font-weight: 600; color: var(--blue);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .minfree-values {
+      font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+      font-size: 12.5px; color: var(--t2);
+      background: var(--white); border-radius: var(--radius-sm);
+      padding: 13px 15px; margin-bottom: 18px;
+      line-height: 2; letter-spacing: 0.02em;
+      border: 0.5px solid var(--border);
+    }
+    .state-card.featured .minfree-values { background: var(--bg); }
+    .state-desc { font-size: 14px; color: var(--t2); line-height: 1.6; }
+
+    /* ── BENTO ─────────────────────────────── */
+    #compat { padding: 96px 28px; background: var(--bg); }
+    .bento-header { margin-bottom: 56px; }
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: auto;
+      gap: 14px;
+    }
+    .bento-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 30px 28px;
+      transition: transform 0.26s ease, box-shadow 0.26s ease;
+    }
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 44px rgba(0,0,0,0.08);
+    }
+    .bento-card.dark { background: var(--black); color: #fff; }
+    .bento-card.warn { background: #fff8f7; border: 1px solid rgba(200,70,50,0.18); }
+
+    .bento-big-num {
+      font-size: 60px; font-weight: 800; letter-spacing: -0.05em;
+      color: var(--t1); line-height: 1;
+    }
+    .bento-big-num sup { font-size: 28px; color: var(--t3); font-weight: 600; vertical-align: super; }
+    .bento-label { font-size: 18px; font-weight: 600; color: var(--t1); margin: 8px 0 6px; }
+    .bento-sub { font-size: 14px; color: var(--t2); line-height: 1.55; }
+
+    .pill-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      border-radius: 980px; padding: 7px 14px;
+      font-size: 13px; font-weight: 600; margin: 0 6px 8px 0;
+      border: 0.5px solid rgba(0,0,0,0.1);
+      background: var(--bg);
+    }
+    .code-path {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 11.5px; color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.07); border-radius: 8px;
+      padding: 11px 14px; margin-top: 16px;
+      letter-spacing: 0.01em; line-height: 1.6; word-break: break-all;
+    }
+    .warn-icon { color: #c0392b; margin-bottom: 10px; }
+    .warn-title { font-size: 14px; font-weight: 600; color: #c0392b; margin-bottom: 6px; }
+    .warn-text { font-size: 13px; color: #7a3028; line-height: 1.55; }
+
+    /* ── TERMINAL ──────────────────────────── */
+    #install { background: var(--white); padding: 96px 28px; }
+    .install-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 56px; align-items: start;
+    }
+    .terminal-wrap {
+      border-radius: var(--radius-lg); overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.14);
+    }
+    .terminal-bar {
+      background: #2c2c2e; padding: 13px 18px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .t-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .terminal-body {
+      background: #1c1c1e; padding: 22px 24px;
+      font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+      font-size: 12.5px; line-height: 1.85;
+    }
+    .t-comment { color: #48484a; }
+    .t-prompt { color: #30d158; }
+    .t-output { color: rgba(255,255,255,0.62); margin-left: 0; }
+    .t-value { color: #64d2ff; }
+    .t-spacer { height: 14px; }
+
+    .steps-list { display: flex; flex-direction: column; gap: 0; }
+    .step-item {
+      display: flex; gap: 20px;
+      padding: 22px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-num {
+      font-size: 13px; font-weight: 700; color: var(--t3);
+      min-width: 24px; padding-top: 2px;
+      letter-spacing: 0.04em;
+    }
+    .step-title { font-size: 16px; font-weight: 600; color: var(--t1); margin-bottom: 5px; }
+    .step-desc { font-size: 14px; color: var(--t2); line-height: 1.6; }
+    code.inline {
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 12px; background: var(--bg);
+      padding: 2px 6px; border-radius: 5px;
+      color: var(--t2); border: 0.5px solid var(--border);
+    }
+
+    /* ── CHANGELOG ─────────────────────────── */
+    #changelog { background: var(--bg); padding: 96px 28px; }
+    .changelog-wrap {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .changelog-header {
+      padding: 28px 36px;
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .version-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: 980px; padding: 6px 14px;
+      font-size: 13px; font-weight: 600;
+    }
+    .version-dot { width: 7px; height: 7px; background: #34c759; border-radius: 50%; }
+    .changelog-list { padding: 0 36px; }
+    .cl-item {
+      display: flex; gap: 18px; align-items: flex-start;
+      padding: 22px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .cl-item:last-child { border-bottom: none; }
+    .cl-icon {
+      width: 34px; height: 34px; background: var(--bg);
+      border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cl-title { font-size: 15px; font-weight: 600; color: var(--t1); margin-bottom: 4px; }
+    .cl-desc { font-size: 14px; color: var(--t2); line-height: 1.58; }
+
+    /* ── FINAL CTA ─────────────────────────── */
+    #cta { background: var(--white); padding: 120px 28px; text-align: center; }
+    .cta-title {
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 800; letter-spacing: -0.038em;
+      color: var(--t1); line-height: 1.04;
+      margin-bottom: 20px;
+    }
+    .cta-sub { font-size: 18px; color: var(--t2); margin-bottom: 44px; line-height: 1.5; }
+    .cta-actions { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    .cta-legal { font-size: 13px; color: var(--t3); margin-top: 22px; }
+    .cta-legal a { color: var(--blue); text-decoration: none; }
+    .cta-legal a:hover { text-decoration: underline; }
+
+    /* ── FOOTER ────────────────────────────── */
+    footer {
+      background: var(--white); border-top: 0.5px solid var(--border);
+      padding: 26px 28px;
+    }
+    .footer-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-left { display: flex; align-items: center; gap: 10px; }
+    .footer-wordmark { font-size: 14px; font-weight: 600; color: var(--t1); }
+    .footer-meta { font-size: 13px; color: var(--t3); }
+    .footer-right { display: flex; gap: 22px; }
+    .footer-right a { font-size: 13px; color: var(--t2); text-decoration: none; transition: color 0.2s; }
+    .footer-right a:hover { color: var(--t1); }
+
+    /* ── FADE-IN ───────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fu   { animation: fadeUp 0.9s ease both; }
+    .fu-1 { animation: fadeUp 0.9s 0.08s ease both; }
+    .fu-2 { animation: fadeUp 0.9s 0.18s ease both; }
+    .fu-3 { animation: fadeUp 0.9s 0.28s ease both; }
+    .fu-4 { animation: fadeUp 0.9s 0.40s ease both; }
+    .fu-5 { animation: fadeUp 0.9s 0.52s ease both; }
+
+    /* ── RESPONSIVE ────────────────────────── */
+    @media (max-width: 900px) {
+      .states-grid { grid-template-columns: 1fr; }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-grid > * { grid-column: span 1 !important; }
+      .install-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .hero-title { font-size: clamp(44px, 14vw, 72px); }
+      .changelog-header, .changelog-list { padding-left: 22px; padding-right: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════ NAV ═══════ -->
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-logo" href="#">
+        <div class="nav-logo-mark">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="3" fill="white" opacity="0.95"/>
+            <circle cx="8" cy="8" r="6.5" stroke="white" stroke-width="1" fill="none" opacity="0.45"/>
+          </svg>
+        </div>
+        <span class="nav-logo-text">LMK Controller</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#states">Profiles</a>
+        <a href="#compat">Compatibility</a>
+        <a href="#install">Install</a>
+        <a href="#changelog">Changelog</a>
+      </nav>
+      <a class="nav-gh" href="https://github.com/ferrdishx/LMK-Controller">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2.23c-3.01.55-3.8-.73-4.04-1.41-.13-.34-.72-1.41-1.23-1.7-.42-.22-1.02-.78-.02-.79.95-.02 1.62.87 1.85 1.23 1.08 1.81 2.8 1.3 3.49.99.11-.78.42-1.3.77-1.6-2.67-.3-5.46-1.34-5.46-5.92 0-1.31.47-2.38 1.23-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.31 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.6-2.8 5.62-5.47 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.83.57A12.01 12.01 0 0024 12C24 5.37 18.63 0 12 0z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════ HERO ══════ -->
+  <section id="hero">
+    <canvas id="three-canvas"></canvas>
+
+    <div class="hero-content">
+      <div class="hero-badge fu">
+        <span class="hero-badge-dot"></span>
+        v1.2 — Available now
+      </div>
+
+      <h1 class="hero-title fu-1">LMK<br>Controller</h1>
+
+      <p class="hero-sub fu-2">Full control over Android's Memory.</p>
+      <p class="hero-desc fu-3">
+        Tune your kernel's Low Memory Killer through a clean WebUI.
+        Boot persistence guaranteed — every single reboot.
+      </p>
+
+      <div class="hero-actions fu-4">
+        <a href="https://github.com/ferrdishx/LMK-Controller/releases" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Get v1.2
+        </a>
+        <a href="https://github.com/ferrdishx/LMK-Controller" class="btn-link">
+          View on GitHub
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="scroll-hint fu-5">
+      <span>Scroll</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ════════════════════════ STATES ════ -->
+  <section id="states">
+    <div class="section-inner">
+      <div class="states-header">
+        <p class="section-tag">Memory Profiles</p>
+        <h2 class="section-heading">Three states.<br>One decision.</h2>
+        <p class="section-sub">Pick a profile — LMK Controller applies the minfree values instantly and persists them through every reboot.</p>
+      </div>
+
+      <div class="states-grid">
+
+        <!-- Performance -->
+        <div class="state-card">
+          <div class="state-badge badge-dark">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            Performance
+          </div>
+          <div class="minfree-values">
+            18432,<br>23040,<br>27648,<br>32256,<br>55296,<br>80640
+          </div>
+          <p class="state-desc">Aggressive RAM reclaim. Terminates background processes early to keep foreground apps responsive and snappy at all times.</p>
+        </div>
+
+        <!-- Stability — recommended -->
+        <div class="state-card featured">
+          <p class="state-recommended">Recommended</p>
+          <div class="state-badge badge-light">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Stability
+          </div>
+          <div class="minfree-values">
+            6144,<br>7680,<br>9216,<br>11264,<br>13312,<br>15360
+          </div>
+          <p class="state-desc">Best of both worlds. Balanced multitasking with good responsiveness. The go-to choice for daily driver devices.</p>
+        </div>
+
+        <!-- Default -->
+        <div class="state-card">
+          <div class="state-badge badge-muted">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
+            Default
+          </div>
+          <div class="minfree-values">
+            0,<br>0,<br>0,<br>0,<br>0,<br>0
+          </div>
+          <p class="state-desc">Restore original OEM kernel values. A clean slate if you want to remove all tweaks and start fresh.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ════════════════════════ BENTO ═════ -->
+  <section id="compat">
+    <div class="section-inner">
+      <div class="bento-header">
+        <p class="section-tag">Compatibility</p>
+        <h2 class="section-heading">Built for<br>real kernels.</h2>
+      </div>
+
+      <div class="bento-grid">
+
+        <!-- Android version — wide left -->
+        <div class="bento-card" style="grid-column: span 4;">
+          <div class="bento-big-num">8.0<sup>+</sup></div>
+          <p class="bento-label">Android</p>
+          <p class="bento-sub">Tested from Oreo through the latest releases. Works on AOSP, MIUI, and most custom ROMs.</p>
+        </div>
+
+        <!-- Magisk + KSU — wide right -->
+        <div class="bento-card" style="grid-column: span 8; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <p class="bento-label" style="margin-bottom:14px;">Root Frameworks</p>
+            <div style="display:flex; flex-wrap:wrap; gap:0;">
+              <span class="pill-tag">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                </svg>
+                Magisk
+              </span>
+              <span class="pill-tag">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                KernelSU
+              </span>
+            </div>
+          </div>
+          <p class="bento-sub" style="margin-top:16px;">Boot persistence uses <code class="inline">/data/adb/service.d/</code> — a directory Magisk always executes at boot, regardless of module state. When uninstalled, <code class="inline">uninstall.sh</code> removes the script automatically.</p>
+        </div>
+
+        <!-- LMK node — dark wide -->
+        <div class="bento-card dark" style="grid-column: span 7;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+            <div style="width:38px; height:38px; background:rgba(255,255,255,0.08); border-radius:10px; display:flex; align-items:center; justify-content:center;">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7">
+                <rect x="4" y="4" width="16" height="16" rx="2"/>
+                <rect x="8" y="8" width="8" height="8" rx="1"/>
+                <path d="M4 9H2M4 12H2M4 15H2M20 9h2M20 12h2M20 15h2M9 4V2M12 4V2M15 4V2M9 20v2M12 20v2M15 20v2"/>
+              </svg>
+            </div>
+            <div>
+              <p style="font-size:16px;font-weight:600;color:#fff;margin-bottom:3px;">Classic LMK Node</p>
+              <p style="font-size:13px;color:rgba(255,255,255,0.42);">Kernel requirement</p>
+            </div>
+          </div>
+          <div class="code-path">/sys/module/lowmemorykiller/parameters/minfree</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:14px;line-height:1.6;">Your kernel must expose this path. Common on devices with kernels predating Android 10 and on many custom kernel builds.</p>
+        </div>
+
+        <!-- LMKD warning -->
+        <div class="bento-card warn" style="grid-column: span 5;">
+          <div class="warn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <p class="warn-title">LMKD devices not supported</p>
+          <p class="warn-text">Android 10+ with newer kernels use a userspace LMKD. The module detects this automatically at boot and displays a clear alert.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ════════════════════════ TERMINAL ══ -->
+  <section id="install">
+    <div class="section-inner">
+      <div class="install-grid">
+
+        <!-- Left: steps -->
+        <div>
+          <p class="section-tag">Quick Install</p>
+          <h2 class="section-heading" style="margin-bottom:10px;">Up and running<br>in four steps.</h2>
+          <p class="section-sub" style="margin-bottom:44px;">No terminal needed — just Magisk and the ZIP. Verify with ADB afterward if you want to confirm the values.</p>
+
+          <div class="steps-list">
+            <div class="step-item">
+              <span class="step-num">01</span>
+              <div>
+                <p class="step-title">Download the ZIP</p>
+                <p class="step-desc">Grab the latest release from GitHub Releases page.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <span class="step-num">02</span>
+              <div>
+                <p class="step-title">Open Magisk or KernelSU</p>
+                <p class="step-desc">Navigate to Modules → Install from storage.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <span class="step-num">03</span>
+              <div>
+                <p class="step-title">Select the ZIP and flash</p>
+                <p class="step-desc">The boot script is installed to <code class="inline">/data/adb/service.d/</code> automatically.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <span class="step-num">04</span>
+              <div>
+                <p class="step-title">Reboot and open the WebUI</p>
+                <p class="step-desc">Access the WebUI inside Magisk to select your profile. Settings survive every reboot.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: terminal -->
+        <div>
+          <p class="section-tag" style="margin-bottom:20px;">Verify via ADB</p>
+          <div class="terminal-wrap">
+            <div class="terminal-bar">
+              <div class="t-dot" style="background:#ff5f56;"></div>
+              <div class="t-dot" style="background:#ffbd2e;"></div>
+              <div class="t-dot" style="background:#27c93f;"></div>
+              <span style="font-family:menlo,monospace;font-size:12px;color:#636366;margin-left:10px;">adb shell</span>
+            </div>
+            <div class="terminal-body">
+              <div class="t-comment"># Confirm kernel values were applied</div>
+              <div class="t-prompt">$ cat /sys/module/lowmemorykiller/parameters/minfree</div>
+              <div class="t-value">18432,23040,27648,32256,55296,80640</div>
+              <div class="t-spacer"></div>
+              <div class="t-comment"># Check which mode is saved</div>
+              <div class="t-prompt">$ cat /data/adb/modules/lmk_controller_feerd/lmk_mode</div>
+              <div class="t-value">performance</div>
+              <div class="t-spacer"></div>
+              <div class="t-comment"># Inspect the boot log</div>
+              <div class="t-prompt">$ cat /data/adb/modules/lmk_controller_feerd/boot.log</div>
+              <div class="t-output">--- Boot Sat Apr 5 00:00:01 -03 2026 ---</div>
+              <div class="t-output">Boot completed, applying...</div>
+              <div class="t-output">Mode: performance</div>
+              <div class="t-value">Done: 18432,23040,27648,32256,55296,80640</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ════════════════════════ CHANGELOG ═ -->
+  <section id="changelog">
+    <div class="section-inner">
+      <p class="section-tag" style="margin-bottom:16px;">Release Notes</p>
+      <h2 class="section-heading" style="margin-bottom:48px;">What's new in v1.2</h2>
+
+      <div class="changelog-wrap">
+        <div class="changelog-header">
+          <div>
+            <p style="font-size:17px;font-weight:700;letter-spacing:-0.02em;color:var(--t1);">Version 1.2</p>
+            <p style="font-size:13px;color:var(--t3);margin-top:3px;">April 2026</p>
+          </div>
+          <span class="version-pill">
+            <span class="version-dot"></span>
+            Latest release
+          </span>
+        </div>
+
+        <div class="changelog-list">
+
+          <div class="cl-item">
+            <div class="cl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
+              </svg>
+            </div>
+            <div>
+              <p class="cl-title">WebUI fully redesigned</p>
+              <p class="cl-desc">Rebuilt interface with live sliders for all 6 minfree thresholds, real-time visual feedback, and improved touch support.</p>
+            </div>
+          </div>
+
+          <div class="cl-item">
+            <div class="cl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="cl-title">New Gamer mode</p>
+              <p class="cl-desc">A dedicated gaming profile optimized to keep critical foreground apps in RAM while aggressively clearing background processes.</p>
+            </div>
+          </div>
+
+          <div class="cl-item">
+            <div class="cl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
+                <path d="M12 2v6M12 16v6M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M16 12h6"/>
+              </svg>
+            </div>
+            <div>
+              <p class="cl-title">Improved service.d boot persistence</p>
+              <p class="cl-desc">Boot logic migrated from <code class="inline">service.sh</code> to <code class="inline">/data/adb/service.d/</code> for guaranteed execution across all Magisk versions and edge cases.</p>
+            </div>
+          </div>
+
+          <div class="cl-item">
+            <div class="cl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+            </div>
+            <div>
+              <p class="cl-title">Boot log with timestamp</p>
+              <p class="cl-desc">Log now records the exact date and time, the applied mode, and all 6 confirmed minfree values from the kernel.</p>
+            </div>
+          </div>
+
+          <div class="cl-item">
+            <div class="cl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <div>
+              <p class="cl-title">LMKD auto-detection</p>
+              <p class="cl-desc">Module now detects userspace LMKD devices at boot and surfaces a clear, actionable warning instead of silently failing.</p>
+            </div>
+          </div>
+
+          <div class="cl-item">
+            <div class="cl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+              </svg>
+            </div>
+            <div>
+              <p class="cl-title">Clean uninstall</p>
+              <p class="cl-desc"><code class="inline">uninstall.sh</code> now fully removes the <code class="inline">service.d</code> script on module removal, leaving zero residue in your system.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════ CTA ═══════ -->
+  <section id="cta">
+    <div style="max-width:560px; margin:0 auto; padding:0 28px;">
+      <h2 class="cta-title">Your memory,<br>your rules.</h2>
+      <p class="cta-sub">Stop letting the OEM decide when your apps die. Take full control.</p>
+      <div class="cta-actions">
+        <a href="https://github.com/ferrdishx/LMK-Controller/releases" class="btn-primary" style="font-size:16px;padding:15px 32px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download v1.2
+        </a>
+        <a href="https://github.com/ferrdishx/LMK-Controller" class="btn-link" style="font-size:16px;">
+          View on GitHub
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+      <p class="cta-legal">MIT License · by <a href="https://github.com/ferrdishx">ferrdishx</a></p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════ FOOTER ════ -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div class="nav-logo-mark" style="width:20px;height:20px;border-radius:6px;">
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="3" fill="white" opacity="0.95"/>
+            <circle cx="8" cy="8" r="6.5" stroke="white" stroke-width="1" fill="none" opacity="0.45"/>
+          </svg>
+        </div>
+        <span class="footer-wordmark">LMK Controller</span>
+        <span class="footer-meta">· Magisk · KernelSU · Android 8.0+</span>
+      </div>
+      <div class="footer-right">
+        <a href="https://github.com/ferrdishx/LMK-Controller">GitHub</a>
+        <a href="https://github.com/ferrdishx/LMK-Controller/releases">Releases</a>
+        <a href="https://github.com/ferrdishx/LMK-Controller/issues">Issues</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+  (function () {
+
+    const canvas  = document.getElementById('three-canvas');
+    const hero    = document.getElementById('hero');
+
+    /* ── Renderer ─────────────────────────────── */
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias : true,
+      alpha     : true,
+      powerPreference: 'high-performance',
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.physicallyCorrectLights = true;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping  = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.3;
+
+    /* ── Scene & Camera ─────────────────────── */
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0, 8);
+
+    /* ── Programmatic env texture ────────────── */
+    function makeEnvTexture () {
+      const W = 1024, H = 512;
+      const ec  = document.createElement('canvas');
+      ec.width = W; ec.height = H;
+      const ctx = ec.getContext('2d');
+
+      /* Sky gradient */
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0,    '#c8ddf0');
+      sky.addColorStop(0.38, '#e8f2fb');
+      sky.addColorStop(0.5,  '#ffffff');
+      sky.addColorStop(0.62, '#f5f5f7');
+      sky.addColorStop(1,    '#dde8f2');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
+
+      /* Warm sun spot */
+      const sun = ctx.createRadialGradient(W*0.72, H*0.22, 0, W*0.72, H*0.22, W*0.32);
+      sun.addColorStop(0,   'rgba(255,235,195,0.75)');
+      sun.addColorStop(0.5, 'rgba(255,215,170,0.30)');
+      sun.addColorStop(1,   'rgba(255,215,170,0)');
+      ctx.fillStyle = sun;
+      ctx.fillRect(0, 0, W, H);
+
+      /* Cool teal fill on left */
+      const cool = ctx.createRadialGradient(W*0.1, H*0.4, 0, W*0.1, H*0.4, W*0.38);
+      cool.addColorStop(0,   'rgba(160,210,240,0.40)');
+      cool.addColorStop(1,   'rgba(160,210,240,0)');
+      ctx.fillStyle = cool;
+      ctx.fillRect(0, 0, W, H);
+
+      const tex = new THREE.CanvasTexture(ec);
+      tex.mapping = THREE.EquirectangularReflectionMapping;
+      return tex;
+    }
+
+    const envTex = makeEnvTexture();
+    scene.environment = envTex;
+
+    /* ── Geometry ────────────────────────────── */
+    // Main torus — smooth, generous tube radius
+    const torusGeo = new THREE.TorusGeometry(1.8, 0.60, 220, 480);
+
+    /* ── Glass material ─────────────────────── */
+    const torusMat = new THREE.MeshPhysicalMaterial({
+      color            : new THREE.Color(0.96, 0.975, 1.00),
+      metalness        : 0.0,
+      roughness        : 0.0,
+      transmission     : 0.88,      // glass see-through
+      thickness        : 2.2,       // IOR depth
+      ior              : 1.50,
+      clearcoat        : 1.0,
+      clearcoatRoughness: 0.0,
+      reflectivity     : 1.0,
+      envMapIntensity  : 1.5,
+      transparent      : true,
+      side             : THREE.DoubleSide,
+      depthWrite       : false,
+    });
+
+    const torus = new THREE.Mesh(torusGeo, torusMat);
+    torus.rotation.x = Math.PI * 0.18;
+    scene.add(torus);
+
+    /* Inner glow ring — adds subtle body to the glass */
+    const glowGeo = new THREE.TorusGeometry(1.8, 0.63, 48, 200);
+    const glowMat = new THREE.MeshBasicMaterial({
+      color       : new THREE.Color(0.78, 0.90, 1.0),
+      transparent : true,
+      opacity     : 0.045,
+      side        : THREE.BackSide,
+      depthWrite  : false,
+    });
+    const glowRing = new THREE.Mesh(glowGeo, glowMat);
+    scene.add(glowRing);
+
+    /* ── Lights ──────────────────────────────── */
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+
+    const sun = new THREE.DirectionalLight(0xfffaf4, 2.4);
+    sun.position.set(4, 6, 5);
+    scene.add(sun);
+
+    // Cool blue — left upper
+    const blueL = new THREE.PointLight(0x6db5f5, 7.0, 14);
+    blueL.position.set(-5, 3, 3);
+    scene.add(blueL);
+
+    // Warm peach — right lower
+    const warmL = new THREE.PointLight(0xffcda0, 5.0, 12);
+    warmL.position.set(5, -2, 2);
+    scene.add(warmL);
+
+    // Top soft white fill
+    const topL = new THREE.PointLight(0xe8f4ff, 3.5, 12);
+    topL.position.set(0, 6, 1);
+    scene.add(topL);
+
+    // Bottom lavender
+    const btmL = new THREE.PointLight(0xf0e8ff, 2.0, 9);
+    btmL.position.set(0, -5, 2);
+    scene.add(btmL);
+
+    /* ── Resize ──────────────────────────────── */
+    function resize () {
+      const w = hero.clientWidth;
+      const h = hero.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    /* ── Input state ─────────────────────────── */
+    let scrollY    = 0, scrollTarget = 0;
+    let mouseX     = 0, mouseXTarget = 0;
+    let mouseY     = 0, mouseYTarget = 0;
+
+    window.addEventListener('scroll', () => {
+      scrollTarget = window.scrollY;
+    });
+
+    window.addEventListener('mousemove', e => {
+      mouseXTarget = (e.clientX / window.innerWidth  - 0.5) * 2;
+      mouseYTarget = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    /* ── Animation loop ──────────────────────── */
+    const clock = new THREE.Clock();
+
+    function lerp (a, b, t) { return a + (b - a) * t; }
+
+    function animate () {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      /* Smooth damp */
+      scrollY = lerp(scrollY, scrollTarget, 0.06);
+      mouseX  = lerp(mouseX,  mouseXTarget, 0.045);
+      mouseY  = lerp(mouseY,  mouseYTarget, 0.045);
+
+      /* Torus rotation — slow base spin + mouse parallax */
+      torus.rotation.y = t * 0.20 + mouseX * 0.14;
+      torus.rotation.x = Math.PI * 0.18 + mouseY * 0.09 + scrollY * 0.0007;
+
+      /* Sync glow ring */
+      glowRing.rotation.y = torus.rotation.y;
+      glowRing.rotation.x = torus.rotation.x;
+
+      /* Gentle float */
+      const floatY = Math.sin(t * 0.48) * 0.07;
+      torus.position.y    = floatY;
+      glowRing.position.y = floatY;
+
+      /* Scale + fade on scroll */
+      const sf = Math.max(0.0, 1.0 - scrollY * 0.0018);
+      torus.scale.setScalar(sf);
+      glowRing.scale.setScalar(sf);
+
+      /* Orbit lights slowly */
+      blueL.position.x = Math.cos(t * 0.35) * 5 - 1;
+      blueL.position.z = Math.sin(t * 0.35) * 3 + 2;
+      warmL.position.x = Math.cos(t * 0.28 + Math.PI) * 4 + 1;
+      warmL.position.z = Math.sin(t * 0.28) * 2 + 1;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  }());
+  </script>
+</body>
+</html>
