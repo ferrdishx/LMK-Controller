@@ -166,6 +166,11 @@ LMK-Controller/
 
 ## Changelog
 
+### [v1.1](../../releases/tag/v1.1)
+- Fixed extraction error on install (`Error while unpacking.`)
+- Improved LMKD detection message during installation
+- Added compatibility check instructions to README
+
 ### [v1.0](../../releases/tag/v1.0)
 - Initial release
 - Performance, Stability and Default modes
