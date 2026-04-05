@@ -457,7 +457,7 @@
     <div class="hero-content">
       <div class="hero-badge fu">
         <span class="hero-badge-dot"></span>
-        v1.2 — Available now
+        v1.1 — Available now
       </div>
 
       <h1 class="hero-title fu-1">LMK<br>Controller</h1>
@@ -495,66 +495,7 @@
     </div>
   </section>
 
-  <!-- ════════════════════════ STATES ════ -->
-  <section id="states">
-    <div class="section-inner">
-      <div class="states-header">
-        <p class="section-tag">Memory Profiles</p>
-        <h2 class="section-heading">Three states.<br>One decision.</h2>
-        <p class="section-sub">Pick a profile — LMK Controller applies the minfree values instantly and persists them through every reboot.</p>
-      </div>
-
-      <div class="states-grid">
-
-        <!-- Performance -->
-        <div class="state-card">
-          <div class="state-badge badge-dark">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-            Performance
-          </div>
-          <div class="minfree-values">
-            18432,<br>23040,<br>27648,<br>32256,<br>55296,<br>80640
-          </div>
-          <p class="state-desc">Aggressive RAM reclaim. Terminates background processes early to keep foreground apps responsive and snappy at all times.</p>
-        </div>
-
-        <!-- Stability — recommended -->
-        <div class="state-card featured">
-          <p class="state-recommended">Recommended</p>
-          <div class="state-badge badge-light">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            Stability
-          </div>
-          <div class="minfree-values">
-            6144,<br>7680,<br>9216,<br>11264,<br>13312,<br>15360
-          </div>
-          <p class="state-desc">Best of both worlds. Balanced multitasking with good responsiveness. The go-to choice for daily driver devices.</p>
-        </div>
-
-        <!-- Default -->
-        <div class="state-card">
-          <div class="state-badge badge-muted">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4M12 16h.01"/>
-            </svg>
-            Default
-          </div>
-          <div class="minfree-values">
-            0,<br>0,<br>0,<br>0,<br>0,<br>0
-          </div>
-          <p class="state-desc">Restore original OEM kernel values. A clean slate if you want to remove all tweaks and start fresh.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider" />
+  -
 
   <!-- ════════════════════════ BENTO ═════ -->
   <section id="compat">
@@ -689,7 +630,7 @@
             <div class="terminal-body">
               <div class="t-comment"># Confirm kernel values were applied</div>
               <div class="t-prompt">$ cat /sys/module/lowmemorykiller/parameters/minfree</div>
-              <div class="t-value">18432,23040,27648,32256,55296,80640</div>
+              <div class="t-value">0,0,0,0,0,0</div>
               <div class="t-spacer"></div>
               <div class="t-comment"># Check which mode is saved</div>
               <div class="t-prompt">$ cat /data/adb/modules/lmk_controller_feerd/lmk_mode</div>
@@ -700,7 +641,7 @@
               <div class="t-output">--- Boot Sat Apr 5 00:00:01 -03 2026 ---</div>
               <div class="t-output">Boot completed, applying...</div>
               <div class="t-output">Mode: performance</div>
-              <div class="t-value">Done: 18432,23040,27648,32256,55296,80640</div>
+              <div class="t-value">Done: 0,0,0,0,0,0</div>
             </div>
           </div>
         </div>
@@ -715,12 +656,12 @@
   <section id="changelog">
     <div class="section-inner">
       <p class="section-tag" style="margin-bottom:16px;">Release Notes</p>
-      <h2 class="section-heading" style="margin-bottom:48px;">What's new in v1.2</h2>
+      <h2 class="section-heading" style="margin-bottom:48px;">What's new in v1.1</h2>
 
       <div class="changelog-wrap">
         <div class="changelog-header">
           <div>
-            <p style="font-size:17px;font-weight:700;letter-spacing:-0.02em;color:var(--t1);">Version 1.2</p>
+            <p style="font-size:17px;font-weight:700;letter-spacing:-0.02em;color:var(--t1);">Version 1.1</p>
             <p style="font-size:13px;color:var(--t3);margin-top:3px;">April 2026</p>
           </div>
           <span class="version-pill">
@@ -751,7 +692,7 @@
               </svg>
             </div>
             <div>
-              <p class="cl-title">New Gamer mode</p>
+              <p class="cl-title">New Performance mode</p>
               <p class="cl-desc">A dedicated gaming profile optimized to keep critical foreground apps in RAM while aggressively clearing background processes.</p>
             </div>
           </div>
@@ -823,7 +764,7 @@
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
-          Download v1.2
+          Download v1.1
         </a>
         <a href="https://github.com/ferrdishx/LMK-Controller" class="btn-link" style="font-size:16px;">
           View on GitHub
