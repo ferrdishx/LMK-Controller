@@ -1,6 +1,5 @@
 #!/system/bin/sh
-# LMK Controller — Boot Service
-# Installed automatically by the module to /data/adb/service.d/
+# Installed automatically by the module to /data/adb/service.d/ xd
 
 MODDIR=/data/adb/modules/lmk_controller_feerd
 CONFIG_FILE="$MODDIR/lmk_mode"
