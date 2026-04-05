@@ -15,6 +15,12 @@
   <img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square"/>
 </p>
 
+## Community
+
+[![Telegram Chat](https://img.shields.io/badge/Telegram-Chat-blue?style=flat-square&logo=telegram)](https://t.me/lmkcontrollerchat)
+[![Telegram News](https://img.shields.io/badge/Telegram-News-blue?style=flat-square&logo=telegram)](https://t.me/lmkcontroller)
+[![GitHub Issues](https://img.shields.io/github/issues/ferrdishx/LKM-Controller?style=flat-square)](https://github.com/ferrdishx/LMK-Controller/issues)
+
 ---
 
 ## What is LMK?
