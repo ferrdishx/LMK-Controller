@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v1.0-blue?style=flat-square"/>
+  <img src="https://img.shields.io/badge/version-v1.1-blue?style=flat-square"/>
   <img src="https://img.shields.io/badge/platform-Magisk%20%7C%20KSU-orange?style=flat-square"/>
   <img src="https://img.shields.io/badge/android-8.0%2B-green?style=flat-square&logo=android"/>
   <img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square"/>
@@ -155,11 +155,14 @@ The UI resets visually on load — this is cosmetic only. The actual minfree val
 ```
 LMK-Controller/
 ├── module.prop
-├── install.sh        ← installs boot service during flashing
-├── uninstall.sh      ← removes boot service on uninstall
-├── lmk_boot.sh       ← copied to /data/adb/service.d/ on install
+├── install.sh          ← installs boot service during flashing
+├── uninstall.sh        ← removes boot service on uninstall
+├── lmk_boot.sh         ← copied to /data/adb/service.d/ on install
+├── post-fs-data.sh     ← runs at early boot stage (Magisk)
+├── service.sh          ← runs at late boot stage (Magisk)
+├── logo.png            ← module logo shown in MMRL
 └── webroot/
-    └── index.html    ← WebUI
+    └── index.html      ← WebUI
 ```
 
 ---
