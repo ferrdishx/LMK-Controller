@@ -1,1002 +1,1838 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LMK Controller — Full Control Over Android's Memory</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LMK Controller — Memory. Controlled.</title>
+<meta name="description" content="Full control over Android's Low Memory Killer via a clean WebUI. Supports Classic LMK and LMKD. By feerd."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root {
+  --bg: #07070f;
+  --bg2: #0c0c18;
+  --surface: #10101e;
+  --surface2: #15152a;
+  --border: rgba(130,120,255,0.12);
+  --border-bright: rgba(130,120,255,0.28);
+  --accent: #4effa8;
+  --accent2: #7b6dff;
+  --accent3: #ff6d6d;
+  --text: #dde0f0;
+  --text-muted: #686890;
+  --text-dim: #9090b8;
+  --font-display: 'Oxanium', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-body: 'Figtree', sans-serif;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --glow-green: 0 0 40px rgba(78,255,168,0.18);
+  --glow-purple: 0 0 40px rgba(123,109,255,0.18);
+}
 
-    :root {
-      --bg:        #F5F5F7;
-      --white:     #FFFFFF;
-      --black:     #000000;
-      --t1:        #1d1d1f;
-      --t2:        #6e6e73;
-      --t3:        #aeaeb2;
-      --border:    rgba(0,0,0,0.1);
-      --blue:      #0071e3;
-      --radius-sm: 10px;
-      --radius-md: 16px;
-      --radius-lg: 22px;
-    }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--t1);
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
 
-    ::selection { background: rgba(0,113,227,0.15); }
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
 
-    /* ── Scrollbar ─────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 3px; }
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: rgba(7,7,15,0.6);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  transition: padding 0.3s;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+.nav-logo-icon {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-logo-icon img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-links a:hover { color: var(--text); background: var(--surface); }
+.nav-cta {
+  background: var(--accent) !important;
+  color: #050510 !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+.nav-cta:hover { background: #6fffba !important; }
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px; height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
 
-    /* ── NAV ───────────────────────────────── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-      height: 52px;
-      background: rgba(245,245,247,0.82);
-      backdrop-filter: saturate(180%) blur(24px);
-      -webkit-backdrop-filter: saturate(180%) blur(24px);
-      border-bottom: 0.5px solid var(--border);
-      display: flex; align-items: center;
-    }
-    .nav-inner {
-      max-width: 1080px; margin: 0 auto; padding: 0 28px;
-      width: 100%; display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 9px;
-      text-decoration: none; color: var(--t1);
-    }
-    .nav-logo-mark {
-      width: 24px; height: 24px; background: var(--black);
-      border-radius: 7px; display: flex; align-items: center; justify-content: center;
-    }
-    .nav-logo-text { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-    .nav-links { display: flex; align-items: center; gap: 28px; }
-    .nav-links a {
-      font-size: 13px; font-weight: 500; color: var(--t2);
-      text-decoration: none; transition: color 0.2s ease;
-    }
-    .nav-links a:hover { color: var(--t1); }
-    .nav-gh {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--white); border: 0.5px solid rgba(0,0,0,0.14);
-      border-radius: 980px; padding: 7px 15px;
-      font-size: 13px; font-weight: 500; color: var(--t1);
-      text-decoration: none; transition: box-shadow 0.22s ease, transform 0.22s ease;
-    }
-    .nav-gh:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-1px); }
+/* ── HERO ── */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  padding: 120px 24px 80px;
+}
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(123,109,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(123,109,255,0.045) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, transparent 0%, var(--bg) 90%);
+  z-index: 1;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(78,255,168,0.08);
+  border: 1px solid rgba(78,255,168,0.25);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.hero-title .accent-green { color: var(--accent); }
+.hero-title .accent-purple { color: var(--accent2); }
+.hero-tagline {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: var(--text-dim);
+  max-width: 540px;
+  margin: 0 auto 40px;
+  animation: fadeUp 0.6s 0.2s ease both;
+  line-height: 1.7;
+}
+.hero-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-primary {
+  background: var(--accent);
+  color: #05050f;
+  box-shadow: 0 0 0 0 rgba(78,255,168,0);
+}
+.btn-primary:hover {
+  background: #6fffba;
+  box-shadow: 0 8px 32px rgba(78,255,168,0.35);
+}
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border-bright);
+}
+.btn-secondary:hover {
+  background: var(--surface);
+  border-color: var(--accent2);
+  box-shadow: var(--glow-purple);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover {
+  color: var(--text);
+  border-color: var(--border-bright);
+}
 
-    /* ── HERO ──────────────────────────────── */
-    #hero {
-      position: relative; min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 100px 28px 80px;
-      overflow: hidden;
-    }
-    #three-canvas {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      pointer-events: none; z-index: 0;
-    }
-    .hero-content { position: relative; z-index: 1; max-width: 700px; }
+/* hero stats */
+.hero-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 64px;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.hero-stat { text-align: center; }
+.hero-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.hero-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.hero-stat-div {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+}
 
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--white); border: 0.5px solid rgba(0,0,0,0.12);
-      border-radius: 980px; padding: 6px 16px;
-      font-size: 13px; font-weight: 500; color: var(--t2);
-      margin-bottom: 36px;
-    }
-    .hero-badge-dot {
-      display: inline-block; width: 7px; height: 7px;
-      background: #34c759; border-radius: 50%;
-    }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    .hero-title {
-      font-size: clamp(56px, 10vw, 96px);
-      font-weight: 800; line-height: 0.96;
-      letter-spacing: -0.04em;
-      color: var(--t1); margin-bottom: 22px;
-    }
-    .hero-sub {
-      font-size: clamp(18px, 2.5vw, 22px);
-      font-weight: 400; color: var(--t2);
-      line-height: 1.45; margin-bottom: 12px;
-    }
-    .hero-desc {
-      font-size: 16px; color: var(--t3);
-      line-height: 1.65; max-width: 440px;
-      margin: 0 auto 44px;
-    }
-    .hero-actions {
-      display: flex; align-items: center; justify-content: center;
-      gap: 18px; flex-wrap: wrap;
-    }
+/* ── SECTIONS ── */
+section {
+  padding: 96px 24px;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+.section-sub {
+  font-size: 1rem;
+  color: var(--text-dim);
+  max-width: 540px;
+  line-height: 1.7;
+}
+.section-header { margin-bottom: 56px; }
+.section-header.centered { text-align: center; }
+.section-header.centered .section-sub { margin: 0 auto; }
 
-    /* ── BUTTONS ───────────────────────────── */
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--black); color: #fff;
-      font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
-      padding: 13px 26px; border-radius: 980px;
-      text-decoration: none; border: none; cursor: pointer;
-      transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
-      -webkit-font-smoothing: antialiased;
-    }
-    .btn-primary:hover {
-      background: #1a1a1a; transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
-    }
-    .btn-primary:active { transform: translateY(0); box-shadow: none; }
+/* reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
 
-    .btn-link {
-      display: inline-flex; align-items: center; gap: 5px;
-      color: var(--blue); font-size: 15px; font-weight: 500;
-      text-decoration: none; transition: opacity 0.2s;
-    }
-    .btn-link:hover { opacity: 0.72; }
-    .btn-link svg { transition: transform 0.2s; }
-    .btn-link:hover svg { transform: translateX(4px); }
+/* ── MODES ── */
+#modes { background: var(--bg2); }
+.modes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.mode-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  cursor: default;
+}
+.mode-card:hover {
+  transform: translateY(-4px);
+}
+.mode-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.mode-card.perf::before { background: linear-gradient(90deg, var(--accent), #00e8ff); }
+.mode-card.stab::before { background: linear-gradient(90deg, var(--accent2), #b06dff); }
+.mode-card.def::before { background: linear-gradient(90deg, #ff9a3c, #ff6d6d); }
+.mode-card.perf:hover { border-color: rgba(78,255,168,0.35); box-shadow: 0 20px 60px rgba(78,255,168,0.08); }
+.mode-card.stab:hover { border-color: rgba(123,109,255,0.35); box-shadow: 0 20px 60px rgba(123,109,255,0.08); }
+.mode-card.def:hover  { border-color: rgba(255,154,60,0.35);  box-shadow: 0 20px 60px rgba(255,154,60,0.08); }
 
-    /* ── SCROLL HINT ───────────────────────── */
-    .scroll-hint {
-      position: absolute; bottom: 36px; left: 50%;
-      transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 7px;
-      z-index: 1; animation: scrollBounce 2.4s ease-in-out infinite;
-    }
-    .scroll-hint span {
-      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--t3); font-weight: 500;
-    }
-    @keyframes scrollBounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
-      50% { transform: translateX(-50%) translateY(7px); opacity: 1; }
-    }
+.mode-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.mode-card.perf .mode-icon { background: rgba(78,255,168,0.12); }
+.mode-card.stab .mode-icon { background: rgba(123,109,255,0.12); }
+.mode-card.def  .mode-icon { background: rgba(255,154,60,0.12); }
+.mode-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+.mode-card.perf .mode-name { color: var(--accent); }
+.mode-card.stab .mode-name { color: var(--accent2); }
+.mode-card.def  .mode-name { color: #ff9a3c; }
+.mode-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+.mode-card.perf .mode-tag { background: rgba(78,255,168,0.1); color: var(--accent); }
+.mode-card.stab .mode-tag { background: rgba(123,109,255,0.1); color: var(--accent2); }
+.mode-card.def  .mode-tag { background: rgba(255,154,60,0.1); color: #ff9a3c; }
+.mode-desc {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.mode-minfree {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.mode-minfree-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.mode-minfree-val {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+  word-break: break-all;
+}
+.mode-card.stab .mode-minfree-val { color: var(--accent2); }
+.mode-card.def  .mode-minfree-val { color: #ff9a3c; }
 
-    /* ── SECTIONS SHARED ───────────────────── */
-    .section-inner { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
-    .section-tag {
-      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--t3); margin-bottom: 14px;
-    }
-    .section-heading {
-      font-size: clamp(28px, 4vw, 44px);
-      font-weight: 700; letter-spacing: -0.03em;
-      color: var(--t1); line-height: 1.1; margin-bottom: 14px;
-    }
-    .section-sub {
-      font-size: 17px; color: var(--t2);
-      line-height: 1.55; max-width: 460px;
-    }
-    hr.divider {
-      border: none; border-top: 0.5px solid var(--border); margin: 0;
-    }
+/* ── FEATURES ── */
+#features { background: var(--bg); }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.feat-card:hover {
+  border-color: var(--border-bright);
+  background: var(--surface2);
+  transform: translateY(-3px);
+}
+.feat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% -10%, rgba(123,109,255,0.07), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.feat-card:hover::after { opacity: 1; }
+.feat-icon {
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+.feat-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.feat-desc {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
 
-    /* ── STATES SECTION ────────────────────── */
-    #states { background: var(--white); padding: 96px 28px; }
-    .states-header { text-align: center; margin-bottom: 60px; }
-    .states-header .section-sub { margin: 0 auto; }
-    .states-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-    .state-card {
-      background: var(--bg);
-      border-radius: var(--radius-lg);
-      padding: 32px 26px;
-      transition: transform 0.26s ease, box-shadow 0.26s ease;
-      position: relative; overflow: hidden;
-    }
-    .state-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 52px rgba(0,0,0,0.09);
-    }
-    .state-card.featured {
-      background: var(--white);
-      border: 1.5px solid var(--black);
-    }
-    .state-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      border-radius: 980px; padding: 5px 12px; margin-bottom: 24px;
-      font-size: 12px; font-weight: 600; letter-spacing: 0.03em;
-    }
-    .badge-dark { background: var(--black); color: #fff; }
-    .badge-light { background: var(--white); border: 0.5px solid rgba(0,0,0,0.12); color: var(--t1); }
-    .badge-muted { background: rgba(0,0,0,0.05); color: var(--t2); }
-    .state-recommended {
-      font-size: 11px; font-weight: 600; color: var(--blue);
-      letter-spacing: 0.04em; text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .minfree-values {
-      font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
-      font-size: 12.5px; color: var(--t2);
-      background: var(--white); border-radius: var(--radius-sm);
-      padding: 13px 15px; margin-bottom: 18px;
-      line-height: 2; letter-spacing: 0.02em;
-      border: 0.5px solid var(--border);
-    }
-    .state-card.featured .minfree-values { background: var(--bg); }
-    .state-desc { font-size: 14px; color: var(--t2); line-height: 1.6; }
+/* ── COMPATIBILITY ── */
+#compatibility { background: var(--bg2); }
+.compat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+.compat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.compat-card.lmk-classic { border-top: 2px solid var(--accent); }
+.compat-card.lmkd { border-top: 2px solid var(--accent2); }
+.compat-card:hover { border-color: var(--border-bright); }
+.compat-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.compat-card.lmk-classic .compat-label { color: var(--accent); }
+.compat-card.lmkd .compat-label { color: var(--accent2); }
+.compat-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.compat-desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.compat-method {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.compat-method-title {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.compat-method-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
 
-    /* ── BENTO ─────────────────────────────── */
-    #compat { padding: 96px 28px; background: var(--bg); }
-    .bento-header { margin-bottom: 56px; }
-    .bento-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-auto-rows: auto;
-      gap: 14px;
-    }
-    .bento-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 30px 28px;
-      transition: transform 0.26s ease, box-shadow 0.26s ease;
-    }
-    .bento-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 44px rgba(0,0,0,0.08);
-    }
-    .bento-card.dark { background: var(--black); color: #fff; }
-    .bento-card.warn { background: #fff8f7; border: 1px solid rgba(200,70,50,0.18); }
+/* Check kernel box */
+.check-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+}
+.check-box-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.check-commands {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.check-cmd {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.check-cmd-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.check-cmd-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.check-cmd-dot.green { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.check-cmd-dot.purple { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+.check-cmd code {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.check-cmd .result {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.result::before { content: '→'; color: var(--text-muted); }
 
-    .bento-big-num {
-      font-size: 60px; font-weight: 800; letter-spacing: -0.05em;
-      color: var(--t1); line-height: 1;
-    }
-    .bento-big-num sup { font-size: 28px; color: var(--t3); font-weight: 600; vertical-align: super; }
-    .bento-label { font-size: 18px; font-weight: 600; color: var(--t1); margin: 8px 0 6px; }
-    .bento-sub { font-size: 14px; color: var(--t2); line-height: 1.55; }
+/* ── HOW IT WORKS ── */
+#how-it-works { background: var(--bg); }
+.flow {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.flow-step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 24px;
+  padding: 0 0 40px;
+  position: relative;
+}
+.flow-step:last-child { padding-bottom: 0; }
+.flow-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flow-num {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--accent2);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.flow-line {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(to bottom, var(--border-bright), transparent);
+  margin-top: 8px;
+  min-height: 32px;
+}
+.flow-step:last-child .flow-line { display: none; }
+.flow-content { padding-top: 10px; }
+.flow-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+.flow-desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+.flow-code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: inline-block;
+}
 
-    .pill-tag {
-      display: inline-flex; align-items: center; gap: 7px;
-      border-radius: 980px; padding: 7px 14px;
-      font-size: 13px; font-weight: 600; margin: 0 6px 8px 0;
-      border: 0.5px solid rgba(0,0,0,0.1);
-      background: var(--bg);
-    }
-    .code-path {
-      font-family: 'SF Mono', Menlo, monospace;
-      font-size: 11.5px; color: rgba(255,255,255,0.55);
-      background: rgba(255,255,255,0.07); border-radius: 8px;
-      padding: 11px 14px; margin-top: 16px;
-      letter-spacing: 0.01em; line-height: 1.6; word-break: break-all;
-    }
-    .warn-icon { color: #c0392b; margin-bottom: 10px; }
-    .warn-title { font-size: 14px; font-weight: 600; color: #c0392b; margin-bottom: 6px; }
-    .warn-text { font-size: 13px; color: #7a3028; line-height: 1.55; }
+/* ── INSTALLATION ── */
+#installation { background: var(--bg2); }
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.install-step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 20px;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: border-color 0.25s;
+}
+.install-step:hover { border-color: var(--border-bright); }
+.install-num {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #050510;
+  flex-shrink: 0;
+}
+.install-body {}
+.install-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+.install-desc {
+  font-size: 0.83rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+.install-desc a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.install-desc a:hover { text-decoration: underline; }
 
-    /* ── TERMINAL ──────────────────────────── */
-    #install { background: var(--white); padding: 96px 28px; }
-    .install-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 56px; align-items: start;
-    }
-    .terminal-wrap {
-      border-radius: var(--radius-lg); overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.14);
-    }
-    .terminal-bar {
-      background: #2c2c2e; padding: 13px 18px;
-      display: flex; align-items: center; gap: 7px;
-    }
-    .t-dot { width: 12px; height: 12px; border-radius: 50%; }
-    .terminal-body {
-      background: #1c1c1e; padding: 22px 24px;
-      font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
-      font-size: 12.5px; line-height: 1.85;
-    }
-    .t-comment { color: #48484a; }
-    .t-prompt { color: #30d158; }
-    .t-output { color: rgba(255,255,255,0.62); margin-left: 0; }
-    .t-value { color: #64d2ff; }
-    .t-spacer { height: 14px; }
+/* ── TERMINAL ── */
+#verify { background: var(--bg); }
+.terminal {
+  background: #060610;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  font-family: var(--font-mono);
+}
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.t-dot { width: 12px; height: 12px; border-radius: 50%; }
+.t-dot.red { background: #ff5f57; }
+.t-dot.yellow { background: #febc2e; }
+.t-dot.green { background: #28c840; }
+.terminal-title {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-left: auto;
+  letter-spacing: 0.06em;
+}
+.terminal-body { padding: 24px; }
+.t-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.t-prompt { color: var(--accent); flex-shrink: 0; }
+.t-cmd { color: var(--text); }
+.t-comment { color: var(--text-muted); font-size: 0.75rem; margin-left: 4px; }
+.t-out { color: var(--text-dim); margin-left: 16px; font-size: 0.78rem; }
+.t-success { color: var(--accent); }
+.t-info { color: #7bdcff; }
+.t-blank { margin-bottom: 8px; }
 
-    .steps-list { display: flex; flex-direction: column; gap: 0; }
-    .step-item {
-      display: flex; gap: 20px;
-      padding: 22px 0;
-      border-bottom: 0.5px solid var(--border);
-    }
-    .step-item:last-child { border-bottom: none; }
-    .step-num {
-      font-size: 13px; font-weight: 700; color: var(--t3);
-      min-width: 24px; padding-top: 2px;
-      letter-spacing: 0.04em;
-    }
-    .step-title { font-size: 16px; font-weight: 600; color: var(--t1); margin-bottom: 5px; }
-    .step-desc { font-size: 14px; color: var(--t2); line-height: 1.6; }
-    code.inline {
-      font-family: 'SF Mono', Menlo, monospace;
-      font-size: 12px; background: var(--bg);
-      padding: 2px 6px; border-radius: 5px;
-      color: var(--t2); border: 0.5px solid var(--border);
-    }
+/* ── CHANGELOG ── */
+#changelog { background: var(--bg2); }
+.changelog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.changelog-entry {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  align-items: flex-start;
+  transition: border-color 0.25s;
+}
+.changelog-entry:hover { border-color: var(--border-bright); }
+.changelog-ver {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--accent2);
+}
+.changelog-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(78,255,168,0.1);
+  color: var(--accent);
+  margin-top: 4px;
+}
+.changelog-tag.beta { background: rgba(255,154,60,0.1); color: #ff9a3c; }
+.changelog-body {}
+.changelog-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: 12px;
+}
+.changelog-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.changelog-items li {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.changelog-items li::before {
+  content: '+';
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
 
-    /* ── CHANGELOG ─────────────────────────── */
-    #changelog { background: var(--bg); padding: 96px 28px; }
-    .changelog-wrap {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-    .changelog-header {
-      padding: 28px 36px;
-      border-bottom: 0.5px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px;
-    }
-    .version-pill {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--bg); border: 0.5px solid var(--border);
-      border-radius: 980px; padding: 6px 14px;
-      font-size: 13px; font-weight: 600;
-    }
-    .version-dot { width: 7px; height: 7px; background: #34c759; border-radius: 50%; }
-    .changelog-list { padding: 0 36px; }
-    .cl-item {
-      display: flex; gap: 18px; align-items: flex-start;
-      padding: 22px 0;
-      border-bottom: 0.5px solid var(--border);
-    }
-    .cl-item:last-child { border-bottom: none; }
-    .cl-icon {
-      width: 34px; height: 34px; background: var(--bg);
-      border-radius: 10px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .cl-title { font-size: 15px; font-weight: 600; color: var(--t1); margin-bottom: 4px; }
-    .cl-desc { font-size: 14px; color: var(--t2); line-height: 1.58; }
+/* ── CONTRIBUTORS ── */
+#contributors { background: var(--bg); }
+.contributors-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.contrib-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.contrib-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
+.contrib-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #050510;
+  flex-shrink: 0;
+}
+.contrib-info {}
+.contrib-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.contrib-role {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  margin-bottom: 8px;
+}
+.contrib-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
 
-    /* ── FINAL CTA ─────────────────────────── */
-    #cta { background: var(--white); padding: 120px 28px; text-align: center; }
-    .cta-title {
-      font-size: clamp(36px, 6vw, 60px);
-      font-weight: 800; letter-spacing: -0.038em;
-      color: var(--t1); line-height: 1.04;
-      margin-bottom: 20px;
-    }
-    .cta-sub { font-size: 18px; color: var(--t2); margin-bottom: 44px; line-height: 1.5; }
-    .cta-actions { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
-    .cta-legal { font-size: 13px; color: var(--t3); margin-top: 22px; }
-    .cta-legal a { color: var(--blue); text-decoration: none; }
-    .cta-legal a:hover { text-decoration: underline; }
+/* Author card */
+.author-card {
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.author-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 80% at 0% 50%, rgba(78,255,168,0.05), transparent);
+  pointer-events: none;
+}
+.author-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #00e8ff);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #050510;
+  flex-shrink: 0;
+}
+.author-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.author-role {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  margin-bottom: 8px;
+}
+.author-desc {
+  font-size: 0.83rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
 
-    /* ── FOOTER ────────────────────────────── */
-    footer {
-      background: var(--white); border-top: 0.5px solid var(--border);
-      padding: 26px 28px;
-    }
-    .footer-inner {
-      max-width: 1080px; margin: 0 auto;
-      display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    }
-    .footer-left { display: flex; align-items: center; gap: 10px; }
-    .footer-wordmark { font-size: 14px; font-weight: 600; color: var(--t1); }
-    .footer-meta { font-size: 13px; color: var(--t3); }
-    .footer-right { display: flex; gap: 22px; }
-    .footer-right a { font-size: 13px; color: var(--t2); text-decoration: none; transition: color 0.2s; }
-    .footer-right a:hover { color: var(--t1); }
+/* ── FOOTER ── */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 48px 24px;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+.footer-brand {}
+.footer-logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.footer-logo-icon {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.footer-logo-icon img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+.footer-tagline {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+.footer-license {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+.footer-col-title {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--text); }
+.footer-bottom {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.footer-copy {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.footer-copy span { color: var(--text-dim); }
 
-    /* ── FADE-IN ───────────────────────────── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .fu   { animation: fadeUp 0.9s ease both; }
-    .fu-1 { animation: fadeUp 0.9s 0.08s ease both; }
-    .fu-2 { animation: fadeUp 0.9s 0.18s ease both; }
-    .fu-3 { animation: fadeUp 0.9s 0.28s ease both; }
-    .fu-4 { animation: fadeUp 0.9s 0.40s ease both; }
-    .fu-5 { animation: fadeUp 0.9s 0.52s ease both; }
+/* ── MISC ── */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
 
-    /* ── RESPONSIVE ────────────────────────── */
-    @media (max-width: 900px) {
-      .states-grid { grid-template-columns: 1fr; }
-      .bento-grid { grid-template-columns: 1fr; }
-      .bento-grid > * { grid-column: span 1 !important; }
-      .install-grid { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
-    }
-    @media (max-width: 600px) {
-      .hero-title { font-size: clamp(44px, 14vw, 72px); }
-      .changelog-header, .changelog-list { padding-left: 22px; padding-right: 22px; }
-    }
-  </style>
+/* separator */
+.sep {
+  width: 40px; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px;
+  margin-bottom: 20px;
+}
+
+/* glow orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 14px 20px; }
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: rgba(7,7,15,0.95);
+    backdrop-filter: blur(20px);
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    gap: 2px;
+  }
+  .nav-hamburger { display: flex; }
+
+  .modes-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .compat-grid { grid-template-columns: 1fr; }
+  .check-commands { grid-template-columns: 1fr; }
+  .changelog-entry { grid-template-columns: 1fr; }
+  .contributors-grid { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  .hero-stats { gap: 20px; }
+  .install-step { grid-template-columns: 1fr; gap: 12px; }
+  section { padding: 64px 20px; }
+}
+
+@media (max-width: 480px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .hero-buttons { flex-direction: column; align-items: center; }
+  .btn { width: 100%; justify-content: center; }
+}
+</style>
 </head>
 <body>
 
-  <!-- ════════════════════════ NAV ═══════ -->
-  <nav>
-    <div class="nav-inner">
-      <a class="nav-logo" href="#">
-        <div class="nav-logo-mark">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="3" fill="white" opacity="0.95"/>
-            <circle cx="8" cy="8" r="6.5" stroke="white" stroke-width="1" fill="none" opacity="0.45"/>
-          </svg>
-        </div>
-        <span class="nav-logo-text">LMK Controller</span>
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon"><img src="https://i.postimg.cc/NjCw17n3/logo.png" alt="LMK Controller logo"/></div>
+    LMK Controller
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#modes">Modes</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#compatibility">Compatibility</a></li>
+    <li><a href="#how-it-works">How it Works</a></li>
+    <li><a href="#installation">Install</a></li>
+    <li><a href="https://github.com/ferrdishx/LMK-Controller" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://github.com/ferrdishx/LMK-Controller/releases/latest" target="_blank" rel="noopener" class="nav-cta">Download</a></li>
+  </ul>
+  <div class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-grid"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-content">
+    <img src="https://i.postimg.cc/NjCw17n3/logo.png" alt="LMK Controller" style="width:96px;height:96px;object-fit:contain;margin-bottom:24px;border-radius:32px;filter:drop-shadow(0 0 28px rgba(78,255,168,0.45));animation:fadeUp 0.5s ease both;display:block;margin-left:auto;margin-right:auto;"/>
+    <div class="hero-badge">Magisk Module · by feerd</div>
+    <h1 class="hero-title">
+      <span class="accent-green">LMK</span> Controller<br/>
+      <span style="color: var(--text-dim); font-size:0.65em; font-weight:400; letter-spacing:0.01em;">Memory. Controlled.</span>
+    </h1>
+    <p class="hero-tagline">
+      Full, precise control over Android's Low Memory Killer — via a clean WebUI. Supports Classic LMK and LMKD with automatic kernel detection and guaranteed boot persistence.
+    </p>
+    <div class="hero-buttons">
+      <a href="https://github.com/ferrdishx/LMK-Controller/releases/latest" class="btn btn-primary" target="_blank" rel="noopener">
+        ↓ Download Latest
       </a>
-      <nav class="nav-links">
-        <a href="#states">Profiles</a>
-        <a href="#compat">Compatibility</a>
-        <a href="#install">Install</a>
-        <a href="#changelog">Changelog</a>
-      </nav>
-      <a class="nav-gh" href="https://github.com/ferrdishx/LMK-Controller">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.8 8.21 11.39.6.11.82-.26.82-.57v-2.23c-3.01.55-3.8-.73-4.04-1.41-.13-.34-.72-1.41-1.23-1.7-.42-.22-1.02-.78-.02-.79.95-.02 1.62.87 1.85 1.23 1.08 1.81 2.8 1.3 3.49.99.11-.78.42-1.3.77-1.6-2.67-.3-5.46-1.34-5.46-5.92 0-1.31.47-2.38 1.23-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.31 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.6-2.8 5.62-5.47 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.83.57A12.01 12.01 0 0024 12C24 5.37 18.63 0 12 0z"/></svg>
-        GitHub
+      <a href="https://github.com/ferrdishx/LMK-Controller" class="btn btn-secondary" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
+        View on GitHub
+      </a>
+      <a href="https://t.me/lmkcontroller" class="btn btn-ghost" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.88 14.204l-2.967-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.943.382z"/></svg>
+        Telegram
       </a>
     </div>
-  </nav>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value">3</div>
+        <div class="hero-stat-label">LMK Modes</div>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">2</div>
+        <div class="hero-stat-label">Kernel Types</div>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">Android 8+</div>
+        <div class="hero-stat-label">Supported</div>
+      </div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">Boot</div>
+        <div class="hero-stat-label">Persistent</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- ════════════════════════ HERO ══════ -->
-  <section id="hero">
-    <canvas id="three-canvas"></canvas>
+<!-- MODES -->
+<section id="modes">
+  <div class="container">
+    <div class="section-header centered">
+      <div class="section-label reveal">Operation Modes</div>
+      <h2 class="section-title reveal reveal-delay-1">Choose your memory strategy</h2>
+      <p class="section-sub reveal reveal-delay-2">Each mode writes specific <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">minfree</code> thresholds to the kernel, shaping exactly how Android manages RAM under pressure.</p>
+    </div>
+    <div class="modes-grid">
 
-    <div class="hero-content">
-      <div class="hero-badge fu">
-        <span class="hero-badge-dot"></span>
-        v1.1 — Available now
+      <div class="mode-card perf reveal">
+        <div class="mode-icon">🎮</div>
+        <div class="mode-name">Performance</div>
+        <div class="mode-tag">Gaming · Max RAM</div>
+        <p class="mode-desc">
+          Disables LMK thresholds entirely — Android stops killing background processes based on memory pressure, dedicating maximum RAM to the active foreground app. Ideal for demanding games that need every MB they can get.
+        </p>
+        <div class="mode-minfree">
+          <div class="mode-minfree-label">minfree values</div>
+          <div class="mode-minfree-val">0,0,0,0,0,0</div>
+        </div>
       </div>
 
-      <h1 class="hero-title fu-1">LMK<br>Controller</h1>
+      <div class="mode-card stab reveal reveal-delay-1">
+        <div class="mode-icon">⚖️</div>
+        <div class="mode-name">Stability</div>
+        <div class="mode-tag">Daily Driver · Balanced</div>
+        <p class="mode-desc">
+          Balanced thresholds that allow smooth multitasking without excessive process killing. Apps stay alive longer in the background, providing a fluid daily-use experience across moderate workloads.
+        </p>
+        <div class="mode-minfree">
+          <div class="mode-minfree-label">minfree values</div>
+          <div class="mode-minfree-val">1024,2048,4096,8192,12288,16384</div>
+        </div>
+      </div>
 
-      <p class="hero-sub fu-2">Full control over Android's Memory.</p>
-      <p class="hero-desc fu-3">
-        Tune your kernel's Low Memory Killer through a clean WebUI.
-        Boot persistence guaranteed — every single reboot.
-      </p>
+      <div class="mode-card def reveal reveal-delay-2">
+        <div class="mode-icon">🔧</div>
+        <div class="mode-name">Default</div>
+        <div class="mode-tag">AOSP-like · Stock Behavior</div>
+        <p class="mode-desc">
+          Near-stock AOSP LMK behavior. Follows Google's reference thresholds, giving you a reliable baseline that mimics what most unmodified Android devices use out of the box.
+        </p>
+        <div class="mode-minfree">
+          <div class="mode-minfree-label">minfree values</div>
+          <div class="mode-minfree-val">4096,5120,6144,7168,8192,9216</div>
+        </div>
+      </div>
 
-      <div class="hero-actions fu-4">
-        <a href="https://github.com/ferrdishx/LMK-Controller/releases" class="btn-primary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Get v1.2
-        </a>
-        <a href="https://github.com/ferrdishx/LMK-Controller" class="btn-link">
-          View on GitHub
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="5" y1="12" x2="19" y2="12"/>
-            <polyline points="12 5 19 12 12 19"/>
-          </svg>
-        </a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal">Core Features</div>
+      <h2 class="section-title reveal reveal-delay-1">Everything you need,<br/>nothing you don't.</h2>
+      <p class="section-sub reveal reveal-delay-2">Engineered for precision, designed for simplicity. LMK Controller does one thing and does it right.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon">🖥️</div>
+        <div class="feat-title">WebUI via MMRL</div>
+        <p class="feat-desc">Clean, browser-based interface accessible through MMRL or any compatible module manager. No root shell required to change modes.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-1">
+        <div class="feat-icon">🔄</div>
+        <div class="feat-title">Boot Persistence</div>
+        <p class="feat-desc">Configuration is written to <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">/data/adb/service.d/</code> and reapplied automatically on every reboot, no manual intervention needed.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-icon">🧠</div>
+        <div class="feat-title">Auto Kernel Detection</div>
+        <p class="feat-desc">Automatically detects whether your device runs Classic LMK (kernel node) or LMKD (userspace daemon) and applies the correct configuration method.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-1">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">LMKD Support</div>
+        <p class="feat-desc">Full support for LMKD via <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">magisk resetprop --file</code> plus a HUP signal to the daemon, ensuring the new values take effect immediately.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-2">
+        <div class="feat-icon">📋</div>
+        <div class="feat-title">Boot Diagnostics Log</div>
+        <p class="feat-desc">Every boot writes a detailed log to <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">/data/adb/modules/lmk_controller_feerd/boot.log</code> — trace exactly what happened during service execution.</p>
+      </div>
+      <div class="feat-card reveal reveal-delay-3">
+        <div class="feat-icon">🧹</div>
+        <div class="feat-title">Clean Uninstall</div>
+        <p class="feat-desc">Removing the module automatically cleans up the boot service from <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">service.d</code>, leaving no stray scripts behind on your system.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPATIBILITY -->
+<section id="compatibility">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal">Compatibility</div>
+      <h2 class="section-title reveal reveal-delay-1">Classic LMK vs LMKD</h2>
+      <p class="section-sub reveal reveal-delay-2">Android uses two different Low Memory Killer implementations. LMK Controller detects yours automatically and applies the right method.</p>
+    </div>
+
+    <div class="compat-grid reveal">
+      <div class="compat-card lmk-classic">
+        <div class="compat-label">Kernel Space</div>
+        <h3 class="compat-name">Classic LMK</h3>
+        <p class="compat-desc">The traditional kernel-level Low Memory Killer, present in older Android kernels. It reads minfree thresholds directly from a sysfs node in the kernel.</p>
+        <div class="compat-method">
+          <div class="compat-method-title">Write Method</div>
+          <div class="compat-method-desc">Values are written directly to <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">/sys/module/lowmemorykiller/parameters/minfree</code> via a shell echo.</div>
+        </div>
+        <div class="compat-method">
+          <div class="compat-method-title">Presence Check</div>
+          <div class="compat-method-desc">If the sysfs path exists, Classic LMK is active on your device.</div>
+        </div>
+      </div>
+      <div class="compat-card lmkd">
+        <div class="compat-label">Userspace Daemon</div>
+        <h3 class="compat-name">LMKD</h3>
+        <p class="compat-desc">Android's modern Low Memory Killer Daemon, running in userspace. It reads system properties to determine thresholds and is used on most devices running Android 10+.</p>
+        <div class="compat-method">
+          <div class="compat-method-title">Write Method</div>
+          <div class="compat-method-desc">Properties are set via <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">magisk resetprop --file</code> and the daemon is restarted with a HUP signal to apply changes.</div>
+        </div>
+        <div class="compat-method">
+          <div class="compat-method-title">Presence Check</div>
+          <div class="compat-method-desc">If <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">ro.lmk.use_minfree_levels</code> is blank or <code style="font-family:var(--font-mono);font-size:0.85em">false</code>, LMKD is your implementation.</div>
+        </div>
       </div>
     </div>
 
-    <div class="scroll-hint fu-5">
-      <span>Scroll</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2">
-        <polyline points="6 9 12 15 18 9"/>
-      </svg>
-    </div>
-  </section>
-
-  -
-
-  <!-- ════════════════════════ BENTO ═════ -->
-  <section id="compat">
-    <div class="section-inner">
-      <div class="bento-header">
-        <p class="section-tag">Compatibility</p>
-        <h2 class="section-heading">Built for<br>real kernels.</h2>
+    <div class="check-box reveal reveal-delay-1">
+      <div class="check-box-title">
+        🔍 How to identify your kernel type in Termux
       </div>
-
-      <div class="bento-grid">
-
-        <!-- Android version — wide left -->
-        <div class="bento-card" style="grid-column: span 4;">
-          <div class="bento-big-num">8.0<sup>+</sup></div>
-          <p class="bento-label">Android</p>
-          <p class="bento-sub">Tested from Oreo through the latest releases. Works on AOSP, MIUI, and most custom ROMs.</p>
-        </div>
-
-        <!-- Magisk + KSU — wide right -->
-        <div class="bento-card" style="grid-column: span 8; display:flex; flex-direction:column; justify-content:space-between;">
-          <div>
-            <p class="bento-label" style="margin-bottom:14px;">Root Frameworks</p>
-            <div style="display:flex; flex-wrap:wrap; gap:0;">
-              <span class="pill-tag">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
-                </svg>
-                Magisk
-              </span>
-              <span class="pill-tag">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                KernelSU
-              </span>
-            </div>
+      <div class="check-commands">
+        <div class="check-cmd">
+          <div class="check-cmd-label">
+            <span class="check-cmd-dot green"></span>
+            Check for Classic LMK
           </div>
-          <p class="bento-sub" style="margin-top:16px;">Boot persistence uses <code class="inline">/data/adb/service.d/</code> — a directory Magisk always executes at boot, regardless of module state. When uninstalled, <code class="inline">uninstall.sh</code> removes the script automatically.</p>
+          <code>ls /sys/module/lowmemorykiller/parameters/minfree</code>
+          <div class="result">Exists → Classic LMK active</div>
         </div>
-
-        <!-- LMK node — dark wide -->
-        <div class="bento-card dark" style="grid-column: span 7;">
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
-            <div style="width:38px; height:38px; background:rgba(255,255,255,0.08); border-radius:10px; display:flex; align-items:center; justify-content:center;">
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7">
-                <rect x="4" y="4" width="16" height="16" rx="2"/>
-                <rect x="8" y="8" width="8" height="8" rx="1"/>
-                <path d="M4 9H2M4 12H2M4 15H2M20 9h2M20 12h2M20 15h2M9 4V2M12 4V2M15 4V2M9 20v2M12 20v2M15 20v2"/>
-              </svg>
-            </div>
-            <div>
-              <p style="font-size:16px;font-weight:600;color:#fff;margin-bottom:3px;">Classic LMK Node</p>
-              <p style="font-size:13px;color:rgba(255,255,255,0.42);">Kernel requirement</p>
-            </div>
+        <div class="check-cmd">
+          <div class="check-cmd-label">
+            <span class="check-cmd-dot purple"></span>
+            Check for LMKD
           </div>
-          <div class="code-path">/sys/module/lowmemorykiller/parameters/minfree</div>
-          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:14px;line-height:1.6;">Your kernel must expose this path. Common on devices with kernels predating Android 10 and on many custom kernel builds.</p>
+          <code>getprop ro.lmk.use_minfree_levels</code>
+          <div class="result">Blank or false → LMKD active</div>
         </div>
-
-        <!-- LMKD warning -->
-        <div class="bento-card warn" style="grid-column: span 5;">
-          <div class="warn-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </div>
-          <p class="warn-title">LMKD devices not supported</p>
-          <p class="warn-text">Android 10+ with newer kernels use a userspace LMKD. The module detects this automatically at boot and displays a clear alert.</p>
-        </div>
-
       </div>
     </div>
-  </section>
 
-  <hr class="divider" />
+    <!-- Requirements -->
+    <div style="margin-top:32px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px;" class="reveal reveal-delay-2">
+      <div class="feat-card" style="border-top:2px solid var(--accent);">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">Android 8.0+</div>
+        <p class="feat-desc">Requires Oreo or later. Tested up to Android 14+.</p>
+      </div>
+      <div class="feat-card" style="border-top:2px solid var(--accent2);">
+        <div class="feat-icon">🧩</div>
+        <div class="feat-title">Magisk 20.4+ / KernelSU</div>
+        <p class="feat-desc">Full support for both root solutions. Use the module manager of your choice.</p>
+      </div>
+      <div class="feat-card" style="border-top:2px solid #ff9a3c;">
+        <div class="feat-icon">📦</div>
+        <div class="feat-title">MMRL or equivalent</div>
+        <p class="feat-desc">MMRL is recommended for WebUI access. Any compatible module manager works for install.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- ════════════════════════ TERMINAL ══ -->
-  <section id="install">
-    <div class="section-inner">
-      <div class="install-grid">
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="container">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;">
+      <div>
+        <div class="section-label reveal">Boot Flow</div>
+        <h2 class="section-title reveal reveal-delay-1">How it Works</h2>
+        <p class="section-sub reveal reveal-delay-2" style="margin-bottom:40px;">LMK Controller installs a persistent boot service that runs before the Android framework, guaranteeing your LMK configuration is applied on every single reboot.</p>
+        <div class="flow reveal reveal-delay-3">
+          <div class="flow-step">
+            <div class="flow-left">
+              <div class="flow-num">1</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Module installation</div>
+              <p class="flow-desc">Magisk or KernelSU installs the module and writes a boot service script to the system.</p>
+              <div class="flow-code">/data/adb/service.d/lmk_controller.sh</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-left">
+              <div class="flow-num">2</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Boot execution</div>
+              <p class="flow-desc">On every reboot, Magisk's service.d runner executes the script early in the boot process before Android frameworks initialize.</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-left">
+              <div class="flow-num">3</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Kernel type detection</div>
+              <p class="flow-desc">The script automatically checks whether Classic LMK sysfs node exists or LMKD is in use, then selects the correct write path.</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-left">
+              <div class="flow-num">4</div>
+              <div class="flow-line"></div>
+            </div>
+            <div class="flow-content">
+              <div class="flow-title">Values applied + logged</div>
+              <p class="flow-desc">The selected mode's minfree values are written to the kernel or daemon, and the result is recorded in the boot log for diagnostics.</p>
+              <div class="flow-code">/data/adb/modules/lmk_controller_feerd/boot.log</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="t-dot red"></span>
+            <span class="t-dot yellow"></span>
+            <span class="t-dot green"></span>
+            <span class="terminal-title">boot.log</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-line"><span class="t-info">[LMK Controller] Boot service started</span></div>
+            <div class="t-line"><span class="t-prompt">→</span><span class="t-cmd"> Detecting kernel LMK type...</span></div>
+            <div class="t-blank"></div>
+            <div class="t-line"><span class="t-prompt">→</span><span class="t-cmd"> Checking Classic LMK node:</span></div>
+            <div class="t-line"><span class="t-out">  /sys/module/lowmemorykiller/parameters/minfree</span></div>
+            <div class="t-line"><span class="t-out t-success">  → Node not found. Using LMKD.</span></div>
+            <div class="t-blank"></div>
+            <div class="t-line"><span class="t-prompt">→</span><span class="t-cmd"> Current mode: <span class="t-success">stability</span></span></div>
+            <div class="t-line"><span class="t-prompt">→</span><span class="t-cmd"> Applying minfree via resetprop...</span></div>
+            <div class="t-line"><span class="t-out">  ro.lmk.minfree=1024,2048,4096,8192,12288,16384</span></div>
+            <div class="t-blank"></div>
+            <div class="t-line"><span class="t-prompt">→</span><span class="t-cmd"> Sending HUP signal to lmkd...</span></div>
+            <div class="t-line"><span class="t-out t-success">  → lmkd restarted. Values applied.</span></div>
+            <div class="t-blank"></div>
+            <div class="t-line"><span class="t-success">[LMK Controller] Boot service complete ✓</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <!-- Left: steps -->
+<!-- INSTALLATION -->
+<section id="installation">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal">Get Started</div>
+      <h2 class="section-title reveal reveal-delay-1">Installation</h2>
+      <p class="section-sub reveal reveal-delay-2">Up and running in minutes. All you need is a rooted device with Magisk or KernelSU.</p>
+    </div>
+    <div class="install-steps">
+      <div class="install-step reveal">
+        <div class="install-num">1</div>
+        <div class="install-body">
+          <div class="install-title">Download the module</div>
+          <p class="install-desc">Grab the latest <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">.zip</code> from the <a href="https://github.com/ferrdishx/LMK-Controller/releases/latest" target="_blank">GitHub Releases page</a>. Always use the latest version for best compatibility.</p>
+        </div>
+      </div>
+      <div class="install-step reveal reveal-delay-1">
+        <div class="install-num">2</div>
+        <div class="install-body">
+          <div class="install-title">Install via Magisk / KernelSU</div>
+          <p class="install-desc">Open your root manager (Magisk App, KernelSU App, or MMRL), go to the Modules section, and tap "Install from storage". Select the downloaded zip file.</p>
+        </div>
+      </div>
+      <div class="install-step reveal reveal-delay-2">
+        <div class="install-num">3</div>
+        <div class="install-body">
+          <div class="install-title">Reboot your device</div>
+          <p class="install-desc">Reboot to allow the boot service to register in <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">/data/adb/service.d/</code>. The module will apply your chosen mode on this and every subsequent boot.</p>
+        </div>
+      </div>
+      <div class="install-step reveal reveal-delay-3">
+        <div class="install-num">4</div>
+        <div class="install-body">
+          <div class="install-title">Open the WebUI in MMRL</div>
+          <p class="install-desc">Open <a href="https://ferrdishx.github.io/LMK-Controller/" target="_blank">MMRL</a> and find the LMK Controller module card. Tap the WebUI button to open the control interface and select your preferred mode.</p>
+        </div>
+      </div>
+      <div class="install-step reveal reveal-delay-4">
+        <div class="install-num">5</div>
+        <div class="install-body">
+          <div class="install-title">Apply and reboot</div>
+          <p class="install-desc">Select a mode in the WebUI and tap Apply. Your choice is saved and the boot service will enforce it on every reboot automatically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VERIFY -->
+<section id="verify">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal">Diagnostics</div>
+      <h2 class="section-title reveal reveal-delay-1">Verify it's working</h2>
+      <p class="section-sub reveal reveal-delay-2">Use Termux or any root shell to confirm LMK Controller is active and your values are applied correctly.</p>
+    </div>
+    <div class="terminal reveal reveal-delay-2">
+      <div class="terminal-bar">
+        <span class="t-dot red"></span>
+        <span class="t-dot yellow"></span>
+        <span class="t-dot green"></span>
+        <span class="terminal-title">Termux · Verification Commands</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> <span style="color:var(--text-muted)"># Check which kernel type you have</span></span>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> ls /sys/module/lowmemorykiller/parameters/minfree</span>
+        </div>
+        <div class="t-line">
+          <span class="t-out t-success">  /sys/module/lowmemorykiller/parameters/minfree &nbsp;<span style="color:var(--text-muted)">← Classic LMK found</span></span>
+        </div>
+        <div class="t-blank"></div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> <span style="color:var(--text-muted)"># If Classic LMK — read current values</span></span>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> cat /sys/module/lowmemorykiller/parameters/minfree</span>
+        </div>
+        <div class="t-line">
+          <span class="t-out t-success">  1024,2048,4096,8192,12288,16384 &nbsp;<span style="color:var(--text-muted)">← Stability mode active</span></span>
+        </div>
+        <div class="t-blank"></div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> <span style="color:var(--text-muted)"># If LMKD — check prop values</span></span>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> getprop ro.lmk.use_minfree_levels</span>
+        </div>
+        <div class="t-blank"></div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> <span style="color:var(--text-muted)"># Read the boot log for full diagnostics</span></span>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> cat /data/adb/modules/lmk_controller_feerd/boot.log</span>
+        </div>
+        <div class="t-blank"></div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> <span style="color:var(--text-muted)"># Confirm boot service is registered</span></span>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">$</span>
+          <span class="t-cmd"> ls /data/adb/service.d/ | grep lmk</span>
+        </div>
+        <div class="t-line">
+          <span class="t-out t-success">  lmk_controller.sh &nbsp;<span style="color:var(--text-muted)">← Service registered ✓</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHANGELOG -->
+<section id="changelog">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal">Release History</div>
+      <h2 class="section-title reveal reveal-delay-1">Changelog</h2>
+    </div>
+    <div class="changelog-list">
+      <div class="changelog-entry reveal">
         <div>
-          <p class="section-tag">Quick Install</p>
-          <h2 class="section-heading" style="margin-bottom:10px;">Up and running<br>in four steps.</h2>
-          <p class="section-sub" style="margin-bottom:44px;">No terminal needed — just Magisk and the ZIP. Verify with ADB afterward if you want to confirm the values.</p>
-
-          <div class="steps-list">
-            <div class="step-item">
-              <span class="step-num">01</span>
-              <div>
-                <p class="step-title">Download the ZIP</p>
-                <p class="step-desc">Grab the latest release from GitHub Releases page.</p>
-              </div>
-            </div>
-            <div class="step-item">
-              <span class="step-num">02</span>
-              <div>
-                <p class="step-title">Open Magisk or KernelSU</p>
-                <p class="step-desc">Navigate to Modules → Install from storage.</p>
-              </div>
-            </div>
-            <div class="step-item">
-              <span class="step-num">03</span>
-              <div>
-                <p class="step-title">Select the ZIP and flash</p>
-                <p class="step-desc">The boot script is installed to <code class="inline">/data/adb/service.d/</code> automatically.</p>
-              </div>
-            </div>
-            <div class="step-item">
-              <span class="step-num">04</span>
-              <div>
-                <p class="step-title">Reboot and open the WebUI</p>
-                <p class="step-desc">Access the WebUI inside Magisk to select your profile. Settings survive every reboot.</p>
-              </div>
-            </div>
-          </div>
+          <div class="changelog-ver">v1.2</div>
+          <div class="changelog-tag beta">beta</div>
         </div>
-
-        <!-- Right: terminal -->
+        <div class="changelog-body">
+          <div class="changelog-date">Latest · In testing</div>
+          <ul class="changelog-items">
+            <li>Added full LMKD support via <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">resetprop --file</code> and HUP signal to daemon</li>
+            <li>Boot log now records kernel type detection result for easier diagnostics</li>
+            <li>WebUI now reflects current active mode on open without requiring a reboot</li>
+            <li>Improved error handling when both LMK paths are unavailable</li>
+            <li>Beta testing on Pixel 4a (5G) by SchmyeBubbula confirmed LMKD compatibility</li>
+          </ul>
+        </div>
+      </div>
+      <div class="changelog-entry reveal reveal-delay-1">
         <div>
-          <p class="section-tag" style="margin-bottom:20px;">Verify via ADB</p>
-          <div class="terminal-wrap">
-            <div class="terminal-bar">
-              <div class="t-dot" style="background:#ff5f56;"></div>
-              <div class="t-dot" style="background:#ffbd2e;"></div>
-              <div class="t-dot" style="background:#27c93f;"></div>
-              <span style="font-family:menlo,monospace;font-size:12px;color:#636366;margin-left:10px;">adb shell</span>
-            </div>
-            <div class="terminal-body">
-              <div class="t-comment"># Confirm kernel values were applied</div>
-              <div class="t-prompt">$ cat /sys/module/lowmemorykiller/parameters/minfree</div>
-              <div class="t-value">0,0,0,0,0,0</div>
-              <div class="t-spacer"></div>
-              <div class="t-comment"># Check which mode is saved</div>
-              <div class="t-prompt">$ cat /data/adb/modules/lmk_controller_feerd/lmk_mode</div>
-              <div class="t-value">performance</div>
-              <div class="t-spacer"></div>
-              <div class="t-comment"># Inspect the boot log</div>
-              <div class="t-prompt">$ cat /data/adb/modules/lmk_controller_feerd/boot.log</div>
-              <div class="t-output">--- Boot Sat Apr 5 00:00:01 -03 2026 ---</div>
-              <div class="t-output">Boot completed, applying...</div>
-              <div class="t-output">Mode: performance</div>
-              <div class="t-value">Done: 0,0,0,0,0,0</div>
-            </div>
-          </div>
+          <div class="changelog-ver">v1.1</div>
+          <div class="changelog-tag">stable</div>
         </div>
-
+        <div class="changelog-body">
+          <div class="changelog-date">Stable Release</div>
+          <ul class="changelog-items">
+            <li>Automatic kernel type detection (Classic LMK vs LMKD) implemented</li>
+            <li>Boot service now writes to <code style="font-family:var(--font-mono);font-size:0.85em;color:var(--accent)">/data/adb/service.d/</code> for guaranteed persistence across reboots</li>
+            <li>Clean uninstall script now removes boot service automatically</li>
+            <li>Added Performance mode with all-zero minfree thresholds for gaming</li>
+            <li>Boot log introduced at module directory for diagnostics</li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </section>
-
-  <hr class="divider" />
-
-  <!-- ════════════════════════ CHANGELOG ═ -->
-  <section id="changelog">
-    <div class="section-inner">
-      <p class="section-tag" style="margin-bottom:16px;">Release Notes</p>
-      <h2 class="section-heading" style="margin-bottom:48px;">What's new in v1.1</h2>
-
-      <div class="changelog-wrap">
-        <div class="changelog-header">
-          <div>
-            <p style="font-size:17px;font-weight:700;letter-spacing:-0.02em;color:var(--t1);">Version 1.1</p>
-            <p style="font-size:13px;color:var(--t3);margin-top:3px;">April 2026</p>
-          </div>
-          <span class="version-pill">
-            <span class="version-dot"></span>
-            Latest release
-          </span>
+      <div class="changelog-entry reveal reveal-delay-2">
+        <div>
+          <div class="changelog-ver">v1.0</div>
+          <div class="changelog-tag">stable</div>
         </div>
-
-        <div class="changelog-list">
-
-          <div class="cl-item">
-            <div class="cl-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M3 9h18M9 21V9"/>
-              </svg>
-            </div>
-            <div>
-              <p class="cl-title">WebUI fully redesigned</p>
-              <p class="cl-desc">Rebuilt interface with live sliders for all 6 minfree thresholds, real-time visual feedback, and improved touch support.</p>
-            </div>
-          </div>
-
-          <div class="cl-item">
-            <div class="cl-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-              </svg>
-            </div>
-            <div>
-              <p class="cl-title">New Performance mode</p>
-              <p class="cl-desc">A dedicated gaming profile optimized to keep critical foreground apps in RAM while aggressively clearing background processes.</p>
-            </div>
-          </div>
-
-          <div class="cl-item">
-            <div class="cl-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
-                <path d="M12 2v6M12 16v6M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M16 12h6"/>
-              </svg>
-            </div>
-            <div>
-              <p class="cl-title">Improved service.d boot persistence</p>
-              <p class="cl-desc">Boot logic migrated from <code class="inline">service.sh</code> to <code class="inline">/data/adb/service.d/</code> for guaranteed execution across all Magisk versions and edge cases.</p>
-            </div>
-          </div>
-
-          <div class="cl-item">
-            <div class="cl-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-            </div>
-            <div>
-              <p class="cl-title">Boot log with timestamp</p>
-              <p class="cl-desc">Log now records the exact date and time, the applied mode, and all 6 confirmed minfree values from the kernel.</p>
-            </div>
-          </div>
-
-          <div class="cl-item">
-            <div class="cl-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-            </div>
-            <div>
-              <p class="cl-title">LMKD auto-detection</p>
-              <p class="cl-desc">Module now detects userspace LMKD devices at boot and surfaces a clear, actionable warning instead of silently failing.</p>
-            </div>
-          </div>
-
-          <div class="cl-item">
-            <div class="cl-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-              </svg>
-            </div>
-            <div>
-              <p class="cl-title">Clean uninstall</p>
-              <p class="cl-desc"><code class="inline">uninstall.sh</code> now fully removes the <code class="inline">service.d</code> script on module removal, leaving zero residue in your system.</p>
-            </div>
-          </div>
-
+        <div class="changelog-body">
+          <div class="changelog-date">Initial Release</div>
+          <ul class="changelog-items">
+            <li>Initial release of LMK Controller as a Magisk module</li>
+            <li>WebUI accessible through MMRL for mode selection</li>
+            <li>Stability mode and Default (AOSP-stock) mode available</li>
+            <li>Support for Classic LMK via direct sysfs write</li>
+            <li>Compatible with Magisk 20.4+ and KernelSU on Android 8.0+</li>
+          </ul>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ════════════════════════ CTA ═══════ -->
-  <section id="cta">
-    <div style="max-width:560px; margin:0 auto; padding:0 28px;">
-      <h2 class="cta-title">Your memory,<br>your rules.</h2>
-      <p class="cta-sub">Stop letting the OEM decide when your apps die. Take full control.</p>
-      <div class="cta-actions">
-        <a href="https://github.com/ferrdishx/LMK-Controller/releases" class="btn-primary" style="font-size:16px;padding:15px 32px;">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Download v1.1
-        </a>
-        <a href="https://github.com/ferrdishx/LMK-Controller" class="btn-link" style="font-size:16px;">
-          View on GitHub
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="5" y1="12" x2="19" y2="12"/>
-            <polyline points="12 5 19 12 12 19"/>
-          </svg>
-        </a>
-      </div>
-      <p class="cta-legal">MIT License · by <a href="https://github.com/ferrdishx">ferrdishx</a></p>
+<!-- CONTRIBUTORS -->
+<section id="contributors">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal">The Team</div>
+      <h2 class="section-title reveal reveal-delay-1">Contributors</h2>
     </div>
-  </section>
-
-  <!-- ════════════════════════ FOOTER ════ -->
-  <footer>
-    <div class="footer-inner">
-      <div class="footer-left">
-        <div class="nav-logo-mark" style="width:20px;height:20px;border-radius:6px;">
-          <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="3" fill="white" opacity="0.95"/>
-            <circle cx="8" cy="8" r="6.5" stroke="white" stroke-width="1" fill="none" opacity="0.45"/>
-          </svg>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="author-card reveal">
+        <div class="author-avatar">F</div>
+        <div>
+          <div class="author-name">feerd</div>
+          <div class="author-role">Author · Creator · Maintainer</div>
+          <p class="author-desc">Developed LMK Controller from the ground up — designing the WebUI, boot service architecture, automatic kernel detection logic, and LMKD integration. Maintains the module and all releases.</p>
         </div>
-        <span class="footer-wordmark">LMK Controller</span>
-        <span class="footer-meta">· Magisk · KernelSU · Android 8.0+</span>
       </div>
-      <div class="footer-right">
-        <a href="https://github.com/ferrdishx/LMK-Controller">GitHub</a>
-        <a href="https://github.com/ferrdishx/LMK-Controller/releases">Releases</a>
-        <a href="https://github.com/ferrdishx/LMK-Controller/issues">Issues</a>
+      <div class="contributors-grid">
+        <div class="contrib-card reveal">
+          <div class="contrib-avatar">S</div>
+          <div class="contrib-info">
+            <div class="contrib-name">SchmyeBubbula</div>
+            <div class="contrib-role">Beta Tester · LMKD Verification</div>
+            <p class="contrib-desc">Performed beta testing for LMKD compatibility on the Pixel 4a (5G), confirming the HUP signal approach works correctly on modern Pixel devices running userspace LMKD.</p>
+          </div>
+        </div>
+        <div class="contrib-card reveal reveal-delay-1" style="align-items:center;justify-content:center;border-style:dashed;cursor:pointer;" onclick="window.open('https://t.me/lmkcontrollerchat','_blank')">
+          <div style="text-align:center;width:100%;">
+            <div style="font-size:28px;margin-bottom:10px;">✦</div>
+            <div class="contrib-name" style="color:var(--text-muted)">Want to contribute?</div>
+            <div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;">Join the Telegram community or open a PR on GitHub</div>
+          </div>
+        </div>
       </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <!-- Three.js r128 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script>
-  (function () {
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="footer-logo-icon"><img src="https://i.postimg.cc/NjCw17n3/logo.png" alt="LMK Controller logo"/></div>
+        LMK Controller
+      </div>
+      <p class="footer-tagline">Full control over Android's Low Memory Killer via a clean WebUI. Boot-persistent, kernel-aware, and built for real users.</p>
+      <div class="footer-license">⚖ MIT License · Open Source</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Links</div>
+      <ul class="footer-links">
+        <li><a href="https://github.com/ferrdishx/LMK-Controller" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
+          GitHub Repository
+        </a></li>
+        <li><a href="https://github.com/ferrdishx/LMK-Controller/releases/latest" target="_blank" rel="noopener">
+          ↓ Latest Release
+        </a></li>
+        <li><a href="https://ferrdishx.github.io/LMK-Controller/" target="_blank" rel="noopener">
+          🌐 Official Website
+        </a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Community</div>
+      <ul class="footer-links">
+        <li><a href="https://t.me/lmkcontrollerchat" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.88 14.204l-2.967-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.943.382z"/></svg>
+          Telegram Chat
+        </a></li>
+        <li><a href="https://t.me/lmkcontroller" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.88 14.204l-2.967-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.943.382z"/></svg>
+          Telegram News Channel
+        </a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2024 <span>feerd</span> · LMK Controller · MIT License</div>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <span class="tag-pill">Magisk Module</span>
+      <span class="tag-pill">Open Source</span>
+      <span class="tag-pill">Android 8+</span>
+    </div>
+  </div>
+</footer>
 
-    const canvas  = document.getElementById('three-canvas');
-    const hero    = document.getElementById('hero');
+<script>
+// ── THREE.JS HERO ──
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    /* ── Renderer ─────────────────────────────── */
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias : true,
-      alpha     : true,
-      powerPreference: 'high-performance',
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
+  camera.position.z = 5;
+
+  function resize() {
+    const w = canvas.parentElement.offsetWidth;
+    const h = canvas.parentElement.offsetHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Floating geometric nodes
+  const nodeCount = 90;
+  const nodeGeo = new THREE.SphereGeometry(0.022, 6, 6);
+  const nodeMat = new THREE.MeshBasicMaterial({ color: 0x4effa8 });
+  const nodes = [];
+  const velocities = [];
+
+  for (let i = 0; i < nodeCount; i++) {
+    const mesh = new THREE.Mesh(nodeGeo, nodeMat.clone());
+    const spread = 7;
+    mesh.position.set(
+      (Math.random() - 0.5) * spread,
+      (Math.random() - 0.5) * spread * 0.6,
+      (Math.random() - 0.5) * 3
+    );
+    // Vary color between green and purple
+    const t = Math.random();
+    mesh.material.color.setRGB(
+      0.3 + t * 0.18,
+      t < 0.5 ? 1.0 : 0.43,
+      t < 0.5 ? 0.66 : 1.0
+    );
+    scene.add(mesh);
+    nodes.push(mesh);
+    velocities.push(new THREE.Vector3(
+      (Math.random() - 0.5) * 0.004,
+      (Math.random() - 0.5) * 0.003,
+      (Math.random() - 0.5) * 0.002
+    ));
+  }
+
+  // Lines (edges)
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x4effa8, transparent: true, opacity: 0.12 });
+  const lineGeo = new THREE.BufferGeometry();
+  const maxLines = 200;
+  const positions = new Float32Array(maxLines * 6);
+  lineGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const lineObj = new THREE.LineSegments(lineGeo, lineMat);
+  scene.add(lineObj);
+
+  // Mouse parallax
+  let mx = 0, my = 0;
+  document.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth - 0.5) * 0.4;
+    my = -(e.clientY / window.innerHeight - 0.5) * 0.3;
+  });
+
+  let frame = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    frame++;
+
+    // Move nodes
+    nodes.forEach((n, i) => {
+      n.position.add(velocities[i]);
+      if (Math.abs(n.position.x) > 4) velocities[i].x *= -1;
+      if (Math.abs(n.position.y) > 2.5) velocities[i].y *= -1;
+      if (Math.abs(n.position.z) > 1.5) velocities[i].z *= -1;
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.physicallyCorrectLights = true;
-    renderer.outputEncoding = THREE.sRGBEncoding;
-    renderer.toneMapping  = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
 
-    /* ── Scene & Camera ─────────────────────── */
-    const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(0, 0, 8);
-
-    /* ── Programmatic env texture ────────────── */
-    function makeEnvTexture () {
-      const W = 1024, H = 512;
-      const ec  = document.createElement('canvas');
-      ec.width = W; ec.height = H;
-      const ctx = ec.getContext('2d');
-
-      /* Sky gradient */
-      const sky = ctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0,    '#c8ddf0');
-      sky.addColorStop(0.38, '#e8f2fb');
-      sky.addColorStop(0.5,  '#ffffff');
-      sky.addColorStop(0.62, '#f5f5f7');
-      sky.addColorStop(1,    '#dde8f2');
-      ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, W, H);
-
-      /* Warm sun spot */
-      const sun = ctx.createRadialGradient(W*0.72, H*0.22, 0, W*0.72, H*0.22, W*0.32);
-      sun.addColorStop(0,   'rgba(255,235,195,0.75)');
-      sun.addColorStop(0.5, 'rgba(255,215,170,0.30)');
-      sun.addColorStop(1,   'rgba(255,215,170,0)');
-      ctx.fillStyle = sun;
-      ctx.fillRect(0, 0, W, H);
-
-      /* Cool teal fill on left */
-      const cool = ctx.createRadialGradient(W*0.1, H*0.4, 0, W*0.1, H*0.4, W*0.38);
-      cool.addColorStop(0,   'rgba(160,210,240,0.40)');
-      cool.addColorStop(1,   'rgba(160,210,240,0)');
-      ctx.fillStyle = cool;
-      ctx.fillRect(0, 0, W, H);
-
-      const tex = new THREE.CanvasTexture(ec);
-      tex.mapping = THREE.EquirectangularReflectionMapping;
-      return tex;
+    // Update edges
+    let lineIdx = 0;
+    const pos = lineGeo.attributes.position.array;
+    const threshold = 1.8;
+    outer: for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        if (lineIdx >= maxLines) break outer;
+        const dist = nodes[i].position.distanceTo(nodes[j].position);
+        if (dist < threshold) {
+          pos[lineIdx * 6 + 0] = nodes[i].position.x;
+          pos[lineIdx * 6 + 1] = nodes[i].position.y;
+          pos[lineIdx * 6 + 2] = nodes[i].position.z;
+          pos[lineIdx * 6 + 3] = nodes[j].position.x;
+          pos[lineIdx * 6 + 4] = nodes[j].position.y;
+          pos[lineIdx * 6 + 5] = nodes[j].position.z;
+          lineIdx++;
+        }
+      }
     }
-
-    const envTex = makeEnvTexture();
-    scene.environment = envTex;
-
-    /* ── Geometry ────────────────────────────── */
-    // Main torus — smooth, generous tube radius
-    const torusGeo = new THREE.TorusGeometry(1.8, 0.60, 220, 480);
-
-    /* ── Glass material ─────────────────────── */
-    const torusMat = new THREE.MeshPhysicalMaterial({
-      color            : new THREE.Color(0.96, 0.975, 1.00),
-      metalness        : 0.0,
-      roughness        : 0.0,
-      transmission     : 0.88,      // glass see-through
-      thickness        : 2.2,       // IOR depth
-      ior              : 1.50,
-      clearcoat        : 1.0,
-      clearcoatRoughness: 0.0,
-      reflectivity     : 1.0,
-      envMapIntensity  : 1.5,
-      transparent      : true,
-      side             : THREE.DoubleSide,
-      depthWrite       : false,
-    });
-
-    const torus = new THREE.Mesh(torusGeo, torusMat);
-    torus.rotation.x = Math.PI * 0.18;
-    scene.add(torus);
-
-    /* Inner glow ring — adds subtle body to the glass */
-    const glowGeo = new THREE.TorusGeometry(1.8, 0.63, 48, 200);
-    const glowMat = new THREE.MeshBasicMaterial({
-      color       : new THREE.Color(0.78, 0.90, 1.0),
-      transparent : true,
-      opacity     : 0.045,
-      side        : THREE.BackSide,
-      depthWrite  : false,
-    });
-    const glowRing = new THREE.Mesh(glowGeo, glowMat);
-    scene.add(glowRing);
-
-    /* ── Lights ──────────────────────────────── */
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-
-    const sun = new THREE.DirectionalLight(0xfffaf4, 2.4);
-    sun.position.set(4, 6, 5);
-    scene.add(sun);
-
-    // Cool blue — left upper
-    const blueL = new THREE.PointLight(0x6db5f5, 7.0, 14);
-    blueL.position.set(-5, 3, 3);
-    scene.add(blueL);
-
-    // Warm peach — right lower
-    const warmL = new THREE.PointLight(0xffcda0, 5.0, 12);
-    warmL.position.set(5, -2, 2);
-    scene.add(warmL);
-
-    // Top soft white fill
-    const topL = new THREE.PointLight(0xe8f4ff, 3.5, 12);
-    topL.position.set(0, 6, 1);
-    scene.add(topL);
-
-    // Bottom lavender
-    const btmL = new THREE.PointLight(0xf0e8ff, 2.0, 9);
-    btmL.position.set(0, -5, 2);
-    scene.add(btmL);
-
-    /* ── Resize ──────────────────────────────── */
-    function resize () {
-      const w = hero.clientWidth;
-      const h = hero.clientHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
+    // Clear unused
+    for (let k = lineIdx; k < maxLines; k++) {
+      pos[k * 6] = pos[k * 6 + 1] = pos[k * 6 + 2] = 0;
+      pos[k * 6 + 3] = pos[k * 6 + 4] = pos[k * 6 + 5] = 0;
     }
-    resize();
-    window.addEventListener('resize', resize);
+    lineGeo.attributes.position.needsUpdate = true;
+    lineGeo.setDrawRange(0, lineIdx * 2);
 
-    /* ── Input state ─────────────────────────── */
-    let scrollY    = 0, scrollTarget = 0;
-    let mouseX     = 0, mouseXTarget = 0;
-    let mouseY     = 0, mouseYTarget = 0;
+    // Camera parallax
+    camera.position.x += (mx - camera.position.x) * 0.03;
+    camera.position.y += (my - camera.position.y) * 0.03;
+    camera.lookAt(scene.position);
 
-    window.addEventListener('scroll', () => {
-      scrollTarget = window.scrollY;
-    });
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
 
-    window.addEventListener('mousemove', e => {
-      mouseXTarget = (e.clientX / window.innerWidth  - 0.5) * 2;
-      mouseYTarget = (e.clientY / window.innerHeight - 0.5) * 2;
-    });
+// ── NAV SCROLL ──
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.style.background = window.scrollY > 40 ? 'rgba(7,7,15,0.85)' : 'rgba(7,7,15,0.6)';
+});
 
-    /* ── Animation loop ──────────────────────── */
-    const clock = new THREE.Clock();
+// ── HAMBURGER ──
+function toggleMenu() {
+  document.getElementById('nav-links').classList.toggle('open');
+}
+document.querySelectorAll('#nav-links a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'));
+});
 
-    function lerp (a, b, t) { return a + (b - a) * t; }
-
-    function animate () {
-      requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
-
-      /* Smooth damp */
-      scrollY = lerp(scrollY, scrollTarget, 0.06);
-      mouseX  = lerp(mouseX,  mouseXTarget, 0.045);
-      mouseY  = lerp(mouseY,  mouseYTarget, 0.045);
-
-      /* Torus rotation — slow base spin + mouse parallax */
-      torus.rotation.y = t * 0.20 + mouseX * 0.14;
-      torus.rotation.x = Math.PI * 0.18 + mouseY * 0.09 + scrollY * 0.0007;
-
-      /* Sync glow ring */
-      glowRing.rotation.y = torus.rotation.y;
-      glowRing.rotation.x = torus.rotation.x;
-
-      /* Gentle float */
-      const floatY = Math.sin(t * 0.48) * 0.07;
-      torus.position.y    = floatY;
-      glowRing.position.y = floatY;
-
-      /* Scale + fade on scroll */
-      const sf = Math.max(0.0, 1.0 - scrollY * 0.0018);
-      torus.scale.setScalar(sf);
-      glowRing.scale.setScalar(sf);
-
-      /* Orbit lights slowly */
-      blueL.position.x = Math.cos(t * 0.35) * 5 - 1;
-      blueL.position.z = Math.sin(t * 0.35) * 3 + 2;
-      warmL.position.x = Math.cos(t * 0.28 + Math.PI) * 4 + 1;
-      warmL.position.z = Math.sin(t * 0.28) * 2 + 1;
-
-      renderer.render(scene, camera);
+// ── SCROLL REVEAL ──
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
     }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    animate();
-  }());
-  </script>
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── SMOOTH ANCHOR ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
 </body>
 </html>
