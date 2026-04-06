@@ -9,23 +9,29 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v1.1-blue?style=flat-square"/>
+  <img src="https://img.shields.io/badge/version-v1.2--beta-blue?style=flat-square"/>
   <img src="https://img.shields.io/badge/platform-Magisk%20%7C%20KSU-orange?style=flat-square"/>
   <img src="https://img.shields.io/badge/android-8.0%2B-green?style=flat-square&logo=android"/>
   <img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square"/>
 </p>
 
-## Community
-
-[![Telegram Chat](https://img.shields.io/badge/Telegram-Chat-blue?style=flat-square&logo=telegram)](https://t.me/lmkcontrollerchat)
-[![Telegram News](https://img.shields.io/badge/Telegram-News-blue?style=flat-square&logo=telegram)](https://t.me/lmkcontroller)
-[![GitHub Issues](https://img.shields.io/github/issues/ferrdishx/LKM-Controller?style=flat-square)](https://github.com/ferrdishx/LMK-Controller/issues)
+<p align="center">
+  <a href="https://t.me/lmkcontrollerchat">
+    <img src="https://img.shields.io/badge/Telegram-Chat-blue?style=flat-square&logo=telegram"/>
+  </a>
+  <a href="https://t.me/lmkcontroller">
+    <img src="https://img.shields.io/badge/Telegram-News-blue?style=flat-square&logo=telegram"/>
+  </a>
+  <a href="https://github.com/ferrdishx/LKM-Controller/issues">
+    <img src="https://img.shields.io/github/issues/ferrdishx/LKM-Controller?style=flat-square"/>
+  </a>
+</p>
 
 ---
 
 ## What is LMK?
 
-The **Low Memory Killer** is a kernel mechanism that frees RAM by terminating background apps based on six memory thresholds (`minfree`). Most OEMs configure these conservatively — causing unnecessary app reloads, poor multitasking and lag when switching between apps.
+The **Low Memory Killer** is a kernel mechanism that frees RAM by terminating background apps based on six memory thresholds (`minfree`). Most OEMs configure these conservatively, causing unnecessary app reloads, poor multitasking and lag when switching between apps.
 
 **LMK Controller** lets you tune these values through a visual interface and ensures your configuration survives every reboot automatically.
 
@@ -35,9 +41,9 @@ The **Low Memory Killer** is a kernel mechanism that frees RAM by terminating ba
 
 | Mode | minfree (pages) | Best for |
 |:---:|:---:|:---|
-| ⚡ **Performance** | `0, 0, 0, 0, 0, 0` | Gaming — max RAM for the foreground app |
-| 🌿 **Stability** | `1024, 2048, 4096, 8192, 12288, 16384` | Daily use — balanced multitasking |
-| 🔵 **Default** | `4096, 5120, 6144, 7168, 8192, 9216` | Near-stock — restores AOSP-like behaviour |
+| ⚡ **Performance** | `0, 0, 0, 0, 0, 0` | Gaming / max RAM for the foreground app |
+| 🌿 **Stability** | `1024, 2048, 4096, 8192, 12288, 16384` | Daily use / balanced multitasking |
+| 🔵 **Default** | `4096, 5120, 6144, 7168, 8192, 9216` | Near-stock / restores AOSP-like behaviour |
 
 > 1 page ≈ 4KB &nbsp;→&nbsp; `1024 pages = 4MB`
 
@@ -48,8 +54,9 @@ The **Low Memory Killer** is a kernel mechanism that frees RAM by terminating ba
 - 🌐 Clean WebUI accessible via MMRL
 - 🔁 Settings persist across every reboot
 - 📜 Boot log for easy diagnostics
-- 🧹 Clean uninstall — removes boot service automatically
+- 🧹 Clean uninstall, removes boot service automatically
 - ⚠️ Compatibility check during installation
+- 🆕 **LMKD support**  works on both classic LMK and userspace LMKD kernels
 
 ---
 
@@ -58,23 +65,20 @@ The **Low Memory Killer** is a kernel mechanism that frees RAM by terminating ba
 - Android 8.0+
 - [Magisk](https://github.com/topjohnwu/Magisk) 20.4+ or [KernelSU](https://github.com/tiann/KernelSU)
 - [MMRL](https://github.com/DerGoogler/MMRL) or compatible module manager
-- Kernel with classic LMK node: `/sys/module/lowmemorykiller/parameters/minfree`
 
-> ⚠️ Devices running **LMKD** (userspace LMK, common on Android 10+ with newer kernels) are not supported.
-
-### How to check if your device is compatible
+### How to check your kernel type
 
 Open Termux and run:
 
 ```sh
-# If this file exists → classic LMK → ✅ supported
+# If this file exists → Classic LMK
 ls /sys/module/lowmemorykiller/parameters/minfree
 
-# If this returns "true" → LMKD → ❌ not supported
+# If blank or missing → LMKD
 getprop ro.lmk.use_minfree_levels
 ```
 
-The module detects this automatically during installation and warns you.
+Both are supported. The module detects your kernel type automatically during installation.
 
 ---
 
@@ -103,35 +107,30 @@ Your choice is saved and reapplied automatically on every boot.
 After rebooting, open Termux and run:
 
 ```sh
-# Boot log — confirms the script ran and what it applied
+# Boot log
 cat /data/adb/modules/lmk_controller_feerd/boot.log
-
-# Current minfree values
-cat /sys/module/lowmemorykiller/parameters/minfree
 
 # Saved mode
 cat /data/adb/modules/lmk_controller_feerd/lmk_mode
-```
 
-Expected output:
+# Classic LMK only
+cat /sys/module/lowmemorykiller/parameters/minfree
 
-```
---- Boot Sat Apr  4 17:00:43 -03 2026 ---
-Boot completed, applying...
-Mode: gamer
-Done: 0,0,0,0,0,0
+# LMKD only
+getprop ro.lmk.low
+getprop ro.lmk.medium
+getprop ro.lmk.critical
 ```
 
 ---
 
 ## How boot persistence works
 
-Instead of relying on `service.sh` (which some Magisk versions skip), the module installs a dedicated script into `/data/adb/service.d/` — a directory Magisk **always** executes on boot, regardless of module state.
+Instead of relying on `service.sh` (which some Magisk versions skip), the module installs a dedicated script into `/data/adb/service.d/`  a directory Magisk **always** executes on boot, regardless of module state.
 
-On boot the script:
-1. Waits for `sys.boot_completed = 1`
-2. Applies a short delay to let the system set its own defaults first
-3. Overwrites `minfree` with your saved values
+**Classic LMK**  writes directly to `/sys/module/lowmemorykiller/parameters/minfree`.
+
+**LMKD**  writes a `system.prop` file with the correct `ro.lmk.*` properties and applies them via `magisk resetprop --file`, then signals the LMKD process to reload.
 
 When the module is uninstalled, `uninstall.sh` cleans up the script from `service.d` automatically.
 
@@ -139,20 +138,19 @@ When the module is uninstalled, `uninstall.sh` cleans up the script from `servic
 
 ## Troubleshooting
 
-**Values revert after reboot**
-```sh
-cat /data/adb/modules/lmk_controller_feerd/boot.log
-```
-If it shows `LMK path not found` — your kernel uses LMKD and is not supported.
-
 **Boot log not generated**
 ```sh
 ls -la /data/adb/service.d/lmk_controller.sh
 ```
 If the file is missing, reinstall the module.
 
+**Values revert after reboot**
+
+Check the boot log. If it shows `ERROR: minfree not found` your device uses LMKD, update to v1.2-beta which adds LMKD support.
+
 **WebUI shows wrong mode after reboot**
-The UI resets visually on load — this is cosmetic only. The actual minfree values in the kernel are correct.
+
+The UI resets visually on load, cosmetic only. The actual values applied in the kernel are correct.
 
 ---
 
@@ -160,23 +158,36 @@ The UI resets visually on load — this is cosmetic only. The actual minfree val
 
 ```
 LMK-Controller/
+├── META-INF/
+│   └── com/
+│       └── google/
+│           └── android/
+│               ├── update-binary
+│               └── updater-script
 ├── module.prop
-├── install.sh          ← installs boot service during flashing
-├── uninstall.sh        ← removes boot service on uninstall
-├── lmk_boot.sh         ← copied to /data/adb/service.d/ on install
-├── post-fs-data.sh     ← runs at early boot stage (Magisk)
-├── service.sh          ← runs at late boot stage (Magisk)
-├── logo.png            ← module logo shown in MMRL
+├── install.sh
+├── uninstall.sh
+├── lmk_boot.sh
+├── post-fs-data.sh
+├── service.sh
+├── logo.png
 └── webroot/
-    └── index.html      ← WebUI
+    └── index.html
 ```
 
 ---
 
 ## Changelog
 
+### [v1.2-beta](../../releases/tag/v1.2-beta)
+- Added LMKD support, module now works on both Classic LMK and LMKD kernels
+- Fixed extraction error on install (`! Unzip error`) affecting some Magisk forks
+- Boot script now uses `magisk resetprop --file` for reliable prop application on LMKD
+- Improved installation output with clear success/error messages
+- Boot log now shows kernel type (`classic` or `lmkd`)
+
 ### [v1.1](../../releases/tag/v1.1)
-- Fixed extraction error on install (`Error while unpacking.`)
+- Fixed extraction error on install
 - Improved LMKD detection message during installation
 - Added compatibility check instructions to README
 
@@ -189,8 +200,19 @@ LMK-Controller/
 
 ---
 
+## Contributors
+
+Thanks to everyone who helped test and improve this module.
+
+| | Name | Contribution |
+|:---:|:---:|:---|
+| 👤 | George Machen | Beta testing LMKD support on Pixel 4a (5G) |
+
+---
+
 <p align="center">
   Made by <strong>feerd</strong> &nbsp;·&nbsp;
   <a href="../../releases/latest">Download</a> &nbsp;·&nbsp;
+  <a href="https://t.me/lmkcontrollerchat">Telegram</a> &nbsp;·&nbsp;
   <a href="LICENSE">MIT License</a>
 </p>
