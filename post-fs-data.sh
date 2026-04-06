@@ -1,13 +1,24 @@
 #!/system/bin/sh
-# LMK Controller post-fs-data entrypoint.
-# Optional early apply path: runs before full boot and is safe for legacy LMK writes.
+# LMK Controller — post-fs-data
+# Runs earlier in the boot process (before most system services).
 
-MODDIR=${0%/*}
-BOOT_SCRIPT="$MODDIR/lmk_boot.sh"
-LOGFILE=/data/local/tmp/lmk_controller.log
+MODDIR=/data/adb/modules/lmk_controller_feerd
+CONFIG_FILE="$MODDIR/lmk_mode"
+LMK_PATH=/sys/module/lowmemorykiller/parameters/minfree
 
-if [ -x "$BOOT_SCRIPT" ]; then
-    "$BOOT_SCRIPT" --post-fs-data
-else
-    echo "$(date '+%Y-%m-%d %H:%M:%S') [lmk_controller] ERROR: missing $BOOT_SCRIPT" >> "$LOGFILE"
-fi
+[ -f "$LMK_PATH" ] || exit 0
+[ -f "$CONFIG_FILE" ] || exit 0
+
+MODE=$(tr -d '[:space:]' < "$CONFIG_FILE")
+
+case "$MODE" in
+    gamer)
+        echo "0,0,0,0,0,0" > "$LMK_PATH"
+        ;;
+    stable)
+        echo "1024,2048,4096,8192,12288,16384" > "$LMK_PATH"
+        ;;
+    normal)
+        echo "4096,5120,6144,7168,8192,9216" > "$LMK_PATH"
+        ;;
+esac
