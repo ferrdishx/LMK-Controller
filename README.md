@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" width="500" alt="LMK Controller Logo"/>
+  <img src="Icon.png" width="500" alt="LMK Controller Logo"/>
 </p>
 
 <h1 align="center">LMK Controller</h1>
