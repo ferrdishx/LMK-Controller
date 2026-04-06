@@ -155,6 +155,7 @@
     .mode.sel-gamer  { border-color: rgba(239,68,68,0.4);  background: rgba(239,68,68,0.04); }
     .mode.sel-stable { border-color: rgba(34,197,94,0.4);  background: rgba(34,197,94,0.04); }
     .mode.sel-normal { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.04); }
+    .mode.sel-extreme{ border-color: rgba(168,85,247,0.45); background: rgba(168,85,247,0.08); }
 
     .mode-ico {
       width: 32px;
@@ -184,6 +185,7 @@
     .mode.sel-gamer  .radio { border-color: var(--red);    background: var(--red);    box-shadow: 0 0 8px rgba(239,68,68,0.5); }
     .mode.sel-stable .radio { border-color: var(--green);  background: var(--green);  box-shadow: 0 0 8px rgba(34,197,94,0.5); }
     .mode.sel-normal .radio { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 8px rgba(59,130,246,0.5); }
+    .mode.sel-extreme .radio { border-color: #a855f7; background: #a855f7; box-shadow: 0 0 8px rgba(168,85,247,0.5); }
 
     .grid {
       display: grid;
@@ -322,6 +324,14 @@
         </div>
         <div class="radio" id="r-normal"></div>
       </div>
+      <div class="mode" id="card-extreme" onclick="pick('extreme',event)">
+        <div class="mode-ico">🔥</div>
+        <div class="mode-body">
+          <div class="mode-name">EXTREME</div>
+          <div class="mode-desc">LMKD-only multitasking boost. Higher RAM pressure may cause lag/UI slowdown.</div>
+        </div>
+        <div class="radio" id="r-extreme"></div>
+      </div>
     </div>
   </div>
 
@@ -364,22 +374,24 @@
     gamer:  { values:[0,0,0,0,0,0],                    label:'PERFORMANCE', dot:'red',   status:'active-red'   },
     stable: { values:[1024,2048,4096,8192,12288,16384], label:'STABILITY',   dot:'green', status:'active-green' },
     normal: { values:[4096,5120,6144,7168,8192,9216],   label:'DEFAULT',     dot:'blue',  status:'active-blue'  },
+    extreme:{ values:[0,0,0,0,0,0],                    label:'EXTREME',      dot:'red',   status:'active-red'   },
   };
 
   const CMDS_CLASSIC = {
     gamer:  "echo 0,0,0,0,0,0 > /sys/module/lowmemorykiller/parameters/minfree && setprop sys.lmk.minfree_levels 0:0,0:0,0:0,0:0,0:0,0:0",
     stable: "echo 1024,2048,4096,8192,12288,16384 > /sys/module/lowmemorykiller/parameters/minfree && setprop ro.lmk.low 1001 && setprop sys.lmk.minfree_levels 1024:0,2048:100,4096:200,8192:250,12288:900,16384:950",
     normal: "echo 4096,5120,6144,7168,8192,9216 > /sys/module/lowmemorykiller/parameters/minfree",
+    extreme:"echo 0,0,0,0,0,0 > /sys/module/lowmemorykiller/parameters/minfree && setprop sys.lmk.minfree_levels 0:0,0:0,0:0,0:0,0:0,0:0",
   };
 
   const CMDS_LMKD = {
-    gamer:  "resetprop ro.lmk.low 0 && resetprop ro.lmk.medium 100 && resetprop ro.lmk.critical 0 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 30 && stop lmkd && start lmkd",
-    stable: "resetprop ro.lmk.low 1001 && resetprop ro.lmk.medium 900 && resetprop ro.lmk.critical 800 && resetprop ro.lmk.kill_heaviest_task false && resetprop ro.lmk.thrashing_limit 100 && stop lmkd && start lmkd",
-    normal: "resetprop ro.lmk.low 1001 && resetprop ro.lmk.medium 800 && resetprop ro.lmk.critical 0 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 30 && stop lmkd && start lmkd",
+    gamer:  "resetprop ro.lmk.low 970 && resetprop ro.lmk.medium 920 && resetprop ro.lmk.critical 860 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 45 && resetprop ro.lmk.thrashing_limit_decay 55 && resetprop ro.lmk.swap_util_max 95 && stop lmkd && start lmkd",
+    stable: "resetprop ro.lmk.low 1001 && resetprop ro.lmk.medium 950 && resetprop ro.lmk.critical 900 && resetprop ro.lmk.kill_heaviest_task false && resetprop ro.lmk.thrashing_limit 100 && resetprop ro.lmk.thrashing_limit_decay 80 && resetprop ro.lmk.swap_util_max 80 && stop lmkd && start lmkd",
+    normal: "resetprop ro.lmk.low 990 && resetprop ro.lmk.medium 930 && resetprop ro.lmk.critical 880 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 70 && resetprop ro.lmk.thrashing_limit_decay 65 && resetprop ro.lmk.swap_util_max 90 && stop lmkd && start lmkd",
+    extreme:"echo 100 > /proc/sys/vm/swappiness && resetprop ro.lmk.low 980 && resetprop ro.lmk.medium 930 && resetprop ro.lmk.critical 870 && resetprop ro.lmk.kill_heaviest_task false && resetprop ro.lmk.thrashing_limit 80 && resetprop ro.lmk.thrashing_limit_decay 90 && resetprop ro.lmk.swap_util_max 100 && stop lmkd && start lmkd",
   };
 
   const CONFIG = '/data/adb/modules/lmk_controller_feerd/lmk_mode';
-  const LMK    = '/sys/module/lowmemorykiller/parameters/minfree';
 
   let current = 'stable';
   let isLMKD  = false;
@@ -400,7 +412,7 @@
     current = mode;
     const m = MODES[mode];
 
-    ['gamer','stable','normal'].forEach(k => {
+    ['gamer','stable','normal','extreme'].forEach(k => {
       document.getElementById('card-'+k).className = 'mode';
     });
 
@@ -420,13 +432,16 @@
 
   function apply(e) {
     const btn = document.getElementById('applyBtn');
-    const cmds = isLMKD ? CMDS_LMKD : CMDS_CLASSIC;
-    const cmd     = "su -c '" + cmds[current] + "'";
-    const saveCmd = "su -c 'echo " + current + " > " + CONFIG + "'";
 
     btn.disabled = true;
     btn.textContent = 'Applying...';
-    log('Executing ' + (isLMKD ? 'LMKD' : 'Classic') + ' commands...', 'warn');
+    if (!isLMKD && current === 'extreme') {
+      log('EXTREME is LMKD-only, falling back to PERFORMANCE on LMK.', 'warn');
+      pick('gamer', null);
+    }
+    const cmds = isLMKD ? CMDS_LMKD : CMDS_CLASSIC;
+    const cmd     = "su -c '" + cmds[current] + "'";
+    const saveCmd = "su -c 'echo " + current + " > " + CONFIG + "'";
 
     if (typeof ksu !== 'undefined' && ksu.exec) {
       try {
@@ -454,14 +469,14 @@
   function init() {
     if (typeof ksu !== 'undefined' && ksu.exec) {
       try {
-        const check = ksu.exec("su -c 'ls " + LMK + " 2>/dev/null'").trim();
-        isLMKD = check === '';
+        const check = ksu.exec("su -c '[ -f /system/bin/lmkd ] && echo lmkd'").trim();
+        isLMKD = check === 'lmkd';
         log('Kernel: ' + (isLMKD ? 'LMKD' : 'Classic LMK'), 'ok');
       } catch(e) {}
 
       try {
         const saved = ksu.exec("su -c 'cat " + CONFIG + " 2>/dev/null'").trim();
-        if (['gamer','stable','normal'].includes(saved) && saved !== current) {
+        if (['gamer','stable','normal','extreme'].includes(saved) && saved !== current) {
           pick(saved, null);
           log('Restored \u2192 ' + MODES[saved].label, 'ok');
         }
