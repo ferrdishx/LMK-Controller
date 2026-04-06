@@ -7,6 +7,7 @@ BOOT_SCRIPT="$MODDIR/lmk_boot.sh"
 LOGFILE=/data/local/tmp/lmk_controller.log
 
 if [ -x "$BOOT_SCRIPT" ]; then
+    sleep 5
     "$BOOT_SCRIPT" service
 else
     echo "$(date '+%Y-%m-%d %H:%M:%S') [lmk_controller] ERROR: missing $BOOT_SCRIPT" >> "$LOGFILE"
