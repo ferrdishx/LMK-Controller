@@ -69,11 +69,15 @@
     .logo-mark span:nth-child(3) { opacity: 0.5; }
     .logo-mark span:nth-child(4) { opacity: 0.25; }
 
+<<<<<<< HEAD
     .ver {
       font-size: 11px;
       color: var(--muted);
       letter-spacing: 0.04em;
     }
+=======
+    .ver { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+>>>>>>> 335ec37 (new files)
 
     main {
       flex: 1;
@@ -100,6 +104,7 @@
     .status.active-green { border-color: rgba(34,197,94,0.3); }
     .status.active-blue  { border-color: rgba(59,130,246,0.3); }
 
+<<<<<<< HEAD
     .status-left {
       display: flex;
       align-items: center;
@@ -110,17 +115,55 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
+=======
+    .status-left { display: flex; align-items: center; gap: 8px; }
+
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+>>>>>>> 335ec37 (new files)
       background: var(--green);
       transition: background 0.3s, box-shadow 0.3s;
     }
 
+<<<<<<< HEAD
     .dot.red  { background: var(--red);    box-shadow: 0 0 6px var(--red); }
     .dot.green{ background: var(--green);  box-shadow: 0 0 6px var(--green); }
     .dot.blue { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+=======
+    .dot.red   { background: var(--red);    box-shadow: 0 0 6px var(--red); }
+    .dot.green { background: var(--green);  box-shadow: 0 0 6px var(--green); }
+    .dot.blue  { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+    .dot.amber { background: var(--amber);  box-shadow: 0 0 6px var(--amber); }
+>>>>>>> 335ec37 (new files)
 
     .status-label { font-size: 11px; color: var(--muted); }
     .status-value { font-size: 11px; color: var(--text); letter-spacing: 0.06em; }
 
+<<<<<<< HEAD
+=======
+    .kernel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .kernel-badge.psi    { border-color: rgba(34,197,94,0.3);  color: var(--green); }
+    .kernel-badge.legacy { border-color: rgba(245,158,11,0.3); color: var(--amber); }
+    .kernel-badge.classic{ border-color: rgba(59,130,246,0.3); color: var(--accent); }
+
+    .kb-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: currentColor;
+    }
+
+>>>>>>> 335ec37 (new files)
     .label {
       font-size: 10px;
       color: var(--muted);
@@ -129,11 +172,15 @@
       margin-bottom: 8px;
     }
 
+<<<<<<< HEAD
     .modes {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
+=======
+    .modes { display: flex; flex-direction: column; gap: 4px; }
+>>>>>>> 335ec37 (new files)
 
     .mode {
       display: flex;
@@ -146,8 +193,11 @@
       transition: border-color 0.25s, background 0.25s;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+<<<<<<< HEAD
       position: relative;
       overflow: hidden;
+=======
+>>>>>>> 335ec37 (new files)
     }
 
     .mode:hover { background: var(--surface); }
@@ -155,6 +205,7 @@
     .mode.sel-gamer  { border-color: rgba(239,68,68,0.4);  background: rgba(239,68,68,0.04); }
     .mode.sel-stable { border-color: rgba(34,197,94,0.4);  background: rgba(34,197,94,0.04); }
     .mode.sel-normal { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.04); }
+<<<<<<< HEAD
     .mode.sel-extreme{ border-color: rgba(168,85,247,0.45); background: rgba(168,85,247,0.08); }
 
     .mode-ico {
@@ -164,6 +215,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
+=======
+
+    .mode-ico {
+      width: 32px; height: 32px;
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+>>>>>>> 335ec37 (new files)
       flex-shrink: 0;
       font-size: 15px;
       background: var(--dim);
@@ -174,8 +232,12 @@
     .mode-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
 
     .radio {
+<<<<<<< HEAD
       width: 14px;
       height: 14px;
+=======
+      width: 14px; height: 14px;
+>>>>>>> 335ec37 (new files)
       border-radius: 50%;
       border: 1px solid var(--dim);
       flex-shrink: 0;
@@ -185,6 +247,7 @@
     .mode.sel-gamer  .radio { border-color: var(--red);    background: var(--red);    box-shadow: 0 0 8px rgba(239,68,68,0.5); }
     .mode.sel-stable .radio { border-color: var(--green);  background: var(--green);  box-shadow: 0 0 8px rgba(34,197,94,0.5); }
     .mode.sel-normal .radio { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 8px rgba(59,130,246,0.5); }
+<<<<<<< HEAD
     .mode.sel-extreme .radio { border-color: #a855f7; background: #a855f7; box-shadow: 0 0 8px rgba(168,85,247,0.5); }
 
     .grid {
@@ -193,6 +256,17 @@
       gap: 4px;
     }
 
+=======
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 4px;
+    }
+
+    .grid.six-col { grid-template-columns: repeat(6,1fr); }
+
+>>>>>>> 335ec37 (new files)
     .cell {
       border: 1px solid var(--border);
       border-radius: 4px;
@@ -225,6 +299,7 @@
     .apply:disabled { opacity: 0.35; cursor: not-allowed; }
     .apply.ok { background: var(--green); }
 
+<<<<<<< HEAD
     .log-box {
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -235,6 +310,12 @@
       display: flex;
       align-items: center;
       gap: 6px;
+=======
+    .log-box { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+
+    .log-head {
+      display: flex; align-items: center; gap: 6px;
+>>>>>>> 335ec37 (new files)
       padding: 8px 12px;
       border-bottom: 1px solid var(--border);
     }
@@ -249,6 +330,7 @@
       overflow-y: auto;
     }
 
+<<<<<<< HEAD
     .log-line {
       display: flex;
       gap: 10px;
@@ -261,6 +343,14 @@
     .lm.ok  { color: var(--green); }
     .lm.err { color: var(--red); }
     .lm.warn{ color: var(--amber); }
+=======
+    .log-line { display: flex; gap: 10px; font-size: 10px; line-height: 1.9; }
+    .lt { color: var(--dim); flex-shrink: 0; }
+    .lm { color: var(--muted); }
+    .lm.ok   { color: var(--green); }
+    .lm.err  { color: var(--red); }
+    .lm.warn { color: var(--amber); }
+>>>>>>> 335ec37 (new files)
 
     footer {
       padding: 16px 20px;
@@ -284,22 +374,42 @@
     </div>
     LMK Controller
   </div>
+<<<<<<< HEAD
   <span class="ver">v1.2-beta</span>
+=======
+  <span class="ver">v1.3</span>
+>>>>>>> 335ec37 (new files)
 </header>
 
 <main>
 
+<<<<<<< HEAD
   <div class="status" id="statusBar">
     <div class="status-left">
       <div class="dot green" id="dot"></div>
       <span class="status-label">active mode</span>
     </div>
     <span class="status-value" id="statusVal">STABILITY</span>
+=======
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+    <div class="status" id="statusBar" style="flex:1;">
+      <div class="status-left">
+        <div class="dot green" id="dot"></div>
+        <span class="status-label">active mode</span>
+      </div>
+      <span class="status-value" id="statusVal">STABILITY</span>
+    </div>
+    <div class="kernel-badge" id="kernelBadge">
+      <div class="kb-dot"></div>
+      <span id="kernelLabel">detecting...</span>
+    </div>
+>>>>>>> 335ec37 (new files)
   </div>
 
   <div>
     <div class="label">Mode</div>
     <div class="modes">
+<<<<<<< HEAD
       <div class="mode" id="card-gamer" onclick="pick('gamer',event)">
         <div class="mode-ico">⚡</div>
         <div class="mode-body">
@@ -309,6 +419,17 @@
         <div class="radio" id="r-gamer"></div>
       </div>
       <div class="mode sel-stable" id="card-stable" onclick="pick('stable',event)">
+=======
+      <div class="mode" id="card-gamer" onclick="pick('gamer')">
+        <div class="mode-ico">⚡</div>
+        <div class="mode-body">
+          <div class="mode-name">Performance</div>
+          <div class="mode-desc">Aggressive kills. Max RAM for the foreground app.</div>
+        </div>
+        <div class="radio" id="r-gamer"></div>
+      </div>
+      <div class="mode sel-stable" id="card-stable" onclick="pick('stable')">
+>>>>>>> 335ec37 (new files)
         <div class="mode-ico">🌿</div>
         <div class="mode-body">
           <div class="mode-name">Stability</div>
@@ -316,6 +437,7 @@
         </div>
         <div class="radio" id="r-stable"></div>
       </div>
+<<<<<<< HEAD
       <div class="mode" id="card-normal" onclick="pick('normal',event)">
         <div class="mode-ico">🔵</div>
         <div class="mode-body">
@@ -338,6 +460,22 @@
   <div>
     <div class="label">minfree thresholds (pages)</div>
     <div class="grid">
+=======
+      <div class="mode" id="card-normal" onclick="pick('normal')">
+        <div class="mode-ico">🔵</div>
+        <div class="mode-body">
+          <div class="mode-name">Default</div>
+          <div class="mode-desc">Conservative thresholds. More apps kept in background.</div>
+        </div>
+        <div class="radio" id="r-normal"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="gridSection">
+    <div class="label" id="gridLabel">minfree thresholds (pages)</div>
+    <div class="grid six-col" id="grid">
+>>>>>>> 335ec37 (new files)
       <div class="cell"><div class="cell-lbl">FORE</div><div class="cell-val" id="v0">1024</div></div>
       <div class="cell"><div class="cell-lbl">VIS</div><div class="cell-val" id="v1">2048</div></div>
       <div class="cell"><div class="cell-lbl">SEC</div><div class="cell-val" id="v2">4096</div></div>
@@ -347,7 +485,11 @@
     </div>
   </div>
 
+<<<<<<< HEAD
   <button class="apply" id="applyBtn" onclick="apply(event)">Apply Settings</button>
+=======
+  <button class="apply" id="applyBtn" onclick="applyMode()">Apply Settings</button>
+>>>>>>> 335ec37 (new files)
 
   <div class="log-box">
     <div class="log-head">
@@ -371,6 +513,7 @@
 
 <script>
   const MODES = {
+<<<<<<< HEAD
     gamer:  { values:[0,0,0,0,0,0],                    label:'PERFORMANCE', dot:'red',   status:'active-red'   },
     stable: { values:[1024,2048,4096,8192,12288,16384], label:'STABILITY',   dot:'green', status:'active-green' },
     normal: { values:[4096,5120,6144,7168,8192,9216],   label:'DEFAULT',     dot:'blue',  status:'active-blue'  },
@@ -399,6 +542,35 @@
   const now = () => new Date().toTimeString().slice(0,8);
 
   function log(msg, cls='') {
+=======
+    gamer:  { label: 'PERFORMANCE', dot: 'red',   status: 'active-red'   },
+    stable: { label: 'STABILITY',   dot: 'green',  status: 'active-green' },
+    normal: { label: 'DEFAULT',     dot: 'blue',   status: 'active-blue'  },
+  };
+
+  const MINFREE_VALUES = {
+    gamer:  [1024, 2048, 4096, 6144, 8192, 10240],
+    stable: [1024, 2048, 4096, 8192, 12288, 16384],
+    normal: [4096, 5120, 6144, 7168, 8192, 9216],
+  };
+
+  const PSI_VALUES = {
+    gamer:  { partial: 50,  complete: 400, thrashing: 30,  swap_max: 80,  heaviest: 'true'  },
+    stable: { partial: 70,  complete: 500, thrashing: 100, swap_max: 90,  heaviest: 'false' },
+    normal: { partial: 100, complete: 700, thrashing: 100, swap_max: 95,  heaviest: 'true'  },
+  };
+
+  const CONFIG = '/data/adb/modules/lmk_controller_feerd/lmk_mode';
+  const LMK_NODE = '/sys/module/lowmemorykiller/parameters/minfree';
+  const PSI_NODE = '/proc/pressure/memory';
+
+  let current  = 'stable';
+  let kernelType = 'unknown'; // 'psi_lmkd' | 'legacy_lmkd' | 'classic_lmk'
+
+  const now = () => new Date().toTimeString().slice(0, 8);
+
+  function log(msg, cls = '') {
+>>>>>>> 335ec37 (new files)
     const el = document.getElementById('log');
     const ln = document.createElement('div');
     ln.className = 'log-line';
@@ -407,20 +579,76 @@
     el.scrollTop = el.scrollHeight;
   }
 
+<<<<<<< HEAD
   function pick(mode, e) {
+=======
+  function exec(cmd) {
+    if (typeof ksu !== 'undefined' && ksu.exec) return ksu.exec(cmd).trim();
+    return '';
+  }
+
+  function updateGrid(mode) {
+    const gridLabel = document.getElementById('gridLabel');
+    const grid      = document.getElementById('grid');
+
+    if (kernelType === 'psi_lmkd') {
+      const p = PSI_VALUES[mode];
+      gridLabel.textContent = 'psi stall thresholds (ms) + limits';
+      grid.className = 'grid';
+      grid.innerHTML = `
+        <div class="cell"><div class="cell-lbl">PARTIAL</div><div class="cell-val">${p.partial}</div></div>
+        <div class="cell"><div class="cell-lbl">COMPLETE</div><div class="cell-val">${p.complete}</div></div>
+        <div class="cell"><div class="cell-lbl">THRASH%</div><div class="cell-val">${p.thrashing}</div></div>
+        <div class="cell"><div class="cell-lbl">SWAP MAX</div><div class="cell-val">${p.swap_max}%</div></div>
+        <div class="cell"><div class="cell-lbl">KILL HVY</div><div class="cell-val">${p.heaviest}</div></div>
+        <div class="cell"><div class="cell-lbl">BACKEND</div><div class="cell-val" style="color:var(--green)">PSI</div></div>`;
+    } else if (kernelType === 'legacy_lmkd') {
+      gridLabel.textContent = 'lmkd props (adj pressure levels)';
+      grid.className = 'grid';
+      const lmkd = {
+        gamer:  { low: 0,    med: 200, crit: 100 },
+        stable: { low: 1001, med: 900, crit: 800  },
+        normal: { low: 1001, med: 800, crit: 0    },
+      }[mode];
+      grid.innerHTML = `
+        <div class="cell"><div class="cell-lbl">LOW</div><div class="cell-val">${lmkd.low}</div></div>
+        <div class="cell"><div class="cell-lbl">MEDIUM</div><div class="cell-val">${lmkd.med}</div></div>
+        <div class="cell"><div class="cell-lbl">CRITICAL</div><div class="cell-val">${lmkd.crit}</div></div>`;
+    } else {
+      gridLabel.textContent = 'minfree thresholds (pages)';
+      grid.className = 'grid six-col';
+      const vals = MINFREE_VALUES[mode];
+      const labels = ['FORE','VIS','SEC','HID','CONT','EMPTY'];
+      grid.innerHTML = vals.map((v, i) =>
+        `<div class="cell"><div class="cell-lbl">${labels[i]}</div><div class="cell-val">${v}</div></div>`
+      ).join('');
+    }
+  }
+
+  function pick(mode) {
+>>>>>>> 335ec37 (new files)
     if (mode === current) return;
     current = mode;
     const m = MODES[mode];
 
+<<<<<<< HEAD
     ['gamer','stable','normal','extreme'].forEach(k => {
       document.getElementById('card-'+k).className = 'mode';
     });
 
     document.getElementById('card-'+mode).className = 'mode sel-'+mode;
+=======
+    ['gamer','stable','normal'].forEach(k => {
+      document.getElementById('card-' + k).className = 'mode';
+    });
+
+    document.getElementById('card-' + mode).className = 'mode sel-' + mode;
+>>>>>>> 335ec37 (new files)
     document.getElementById('dot').className = 'dot ' + m.dot;
     document.getElementById('statusVal').textContent = m.label;
     document.getElementById('statusBar').className = 'status ' + m.status;
 
+<<<<<<< HEAD
     m.values.forEach((v, i) => {
       setTimeout(() => {
         document.getElementById('v'+i).textContent = isLMKD ? '-' : v;
@@ -442,16 +670,65 @@
     const cmds = isLMKD ? CMDS_LMKD : CMDS_CLASSIC;
     const cmd     = "su -c '" + cmds[current] + "'";
     const saveCmd = "su -c 'echo " + current + " > " + CONFIG + "'";
+=======
+    updateGrid(mode);
+    log('Mode selected \u2192 ' + m.label);
+  }
+
+  function buildApplyCmd(mode) {
+    if (kernelType === 'psi_lmkd') {
+      const p = PSI_VALUES[mode];
+      return [
+        `resetprop ro.lmk.use_psi true`,
+        `resetprop ro.lmk.use_minfree_levels false`,
+        `resetprop ro.lmk.psi_partial_stall_ms ${p.partial}`,
+        `resetprop ro.lmk.psi_complete_stall_ms ${p.complete}`,
+        `resetprop ro.lmk.kill_heaviest_task ${p.heaviest}`,
+        `resetprop ro.lmk.thrashing_limit ${p.thrashing}`,
+        `resetprop ro.lmk.swap_util_max ${p.swap_max}`,
+        `resetprop lmkd.reinit 1 2>/dev/null || kill -HUP $(pidof lmkd) 2>/dev/null || (stop lmkd && sleep 1 && start lmkd)`,
+        `echo ${mode} > ${CONFIG}`,
+      ].join(' && ');
+
+    } else if (kernelType === 'legacy_lmkd') {
+      const lmkd = {
+        gamer:  `resetprop ro.lmk.low 0 && resetprop ro.lmk.medium 200 && resetprop ro.lmk.critical 100 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 30 && resetprop ro.lmk.use_minfree_levels false`,
+        stable: `resetprop ro.lmk.low 1001 && resetprop ro.lmk.medium 900 && resetprop ro.lmk.critical 800 && resetprop ro.lmk.kill_heaviest_task false && resetprop ro.lmk.thrashing_limit 100 && resetprop ro.lmk.use_minfree_levels false`,
+        normal: `resetprop ro.lmk.low 1001 && resetprop ro.lmk.medium 800 && resetprop ro.lmk.critical 0 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 100 && resetprop ro.lmk.use_minfree_levels false`,
+      }[mode];
+      return `${lmkd} && (resetprop lmkd.reinit 1 2>/dev/null || kill -HUP $(pidof lmkd) 2>/dev/null || (stop lmkd && sleep 1 && start lmkd)) && echo ${mode} > ${CONFIG}`;
+
+    } else {
+      const vals = MINFREE_VALUES[mode].join(',');
+      return `echo ${vals} > ${LMK_NODE} && echo ${mode} > ${CONFIG}`;
+    }
+  }
+
+  function applyMode() {
+    const btn = document.getElementById('applyBtn');
+    btn.disabled = true;
+    btn.textContent = 'Applying...';
+    log('Executing ' + kernelType + ' commands...', 'warn');
+
+    const cmd = `su -c '${buildApplyCmd(current)}'`;
+>>>>>>> 335ec37 (new files)
 
     if (typeof ksu !== 'undefined' && ksu.exec) {
       try {
         ksu.exec(cmd);
+<<<<<<< HEAD
         ksu.exec(saveCmd);
+=======
+>>>>>>> 335ec37 (new files)
         log('Applied. Will persist on reboot.', 'ok');
         btn.textContent = 'Applied';
         btn.classList.add('ok');
         setTimeout(() => { btn.classList.remove('ok'); btn.disabled = false; btn.textContent = 'Apply Settings'; }, 1800);
+<<<<<<< HEAD
       } catch(err) {
+=======
+      } catch (err) {
+>>>>>>> 335ec37 (new files)
         log('Error: ' + err.message, 'err');
         btn.disabled = false;
         btn.textContent = 'Apply Settings';
@@ -466,6 +743,7 @@
     }
   }
 
+<<<<<<< HEAD
   function init() {
     if (typeof ksu !== 'undefined' && ksu.exec) {
       try {
@@ -482,10 +760,67 @@
         }
       } catch(e) {}
     }
+=======
+  function updateKernelBadge(type) {
+    const badge = document.getElementById('kernelBadge');
+    const label = document.getElementById('kernelLabel');
+    if (type === 'psi_lmkd') {
+      badge.className = 'kernel-badge psi';
+      label.textContent = 'PSI';
+    } else if (type === 'legacy_lmkd') {
+      badge.className = 'kernel-badge legacy';
+      label.textContent = 'LMKD';
+    } else {
+      badge.className = 'kernel-badge classic';
+      label.textContent = 'classic';
+    }
+  }
+
+  function init() {
+    if (typeof ksu !== 'undefined' && ksu.exec) {
+      try {
+        const hasClassic = exec(`ls ${LMK_NODE} 2>/dev/null`);
+        const hasPSI     = exec(`ls ${PSI_NODE} 2>/dev/null`);
+
+        if (hasClassic !== '') {
+          kernelType = 'classic_lmk';
+        } else if (hasPSI !== '') {
+          kernelType = 'psi_lmkd';
+        } else {
+          kernelType = 'legacy_lmkd';
+        }
+      } catch (e) {
+        kernelType = 'unknown';
+      }
+
+      log('Kernel type: ' + kernelType, 'ok');
+
+      try {
+        const saved = exec(`cat ${CONFIG} 2>/dev/null`);
+        if (['gamer','stable','normal'].includes(saved) && saved !== current) {
+          pick(saved);
+          log('Restored \u2192 ' + MODES[saved].label, 'ok');
+        } else {
+          updateGrid(current);
+        }
+      } catch (e) {
+        updateGrid(current);
+      }
+    } else {
+      kernelType = 'classic_lmk';
+      updateGrid(current);
+    }
+
+    updateKernelBadge(kernelType);
+>>>>>>> 335ec37 (new files)
   }
 
   window.addEventListener('DOMContentLoaded', init);
 </script>
 
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 335ec37 (new files)

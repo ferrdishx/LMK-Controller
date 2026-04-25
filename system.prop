@@ -1,0 +1,58 @@
+# =============================================================================
+# system.prop — LMK Controller (PSI + LMKD)
+# =============================================================================
+# Este arquivo é lido pelo Magisk durante o boot via PROPFILE=true.
+# As props aqui são "defaults" que o service.sh pode sobrescrever em runtime
+# com resetprop de acordo com o modo escolhido pelo usuário.
+#
+# ATENÇÃO: estas props só têm efeito em kernels com lmkd userspace.
+#          Em kernels com driver clássico (minfree), são ignoradas.
+# =============================================================================
+
+# --- Ativa PSI como backend do lmkd (Android 10+) ---
+# Desativa o modo legacy baseado em vmpressure
+ro.lmk.use_psi=true
+ro.lmk.use_minfree_levels=false
+
+# --- Limiares de pressão PSI (modo "stable" — padrão seguro) ---
+# Valor em milissegundos de "stall" contínuo antes de iniciar kills.
+#
+# partial_stall: ao menos 1 processo travou aguardando memória por X ms
+# complete_stall: TODOS os processos travaram aguardando memória por X ms
+#
+# Recomendação para 4-6 GB de RAM (equilíbrio):
+#   - partial: 70ms  → sensível o suficiente sem falsos positivos
+#   - complete: 500ms → só mata em situação realmente crítica
+ro.lmk.psi_partial_stall_ms=70
+ro.lmk.psi_complete_stall_ms=500
+
+# --- Ajuste de ADJ por nível de pressão ---
+# Processos com ADJ >= este valor são candidatos a kill por nível de pressão.
+# low: pressão leve (desativa com 1001 = nenhum processo elegível)
+# medium: pressão moderada (ADJ >= 900 = hidden apps)
+# critical: pressão crítica (ADJ >= 800 = cached apps)
+ro.lmk.low=1001
+ro.lmk.medium=900
+ro.lmk.critical=800
+
+# --- Comportamento de kill ---
+# true = mata o processo mais pesado do grupo ADJ (economiza mais RAM de uma vez)
+# false = mata o processo no oom_score_adj mais alto (comportamento AOSP padrão)
+ro.lmk.kill_heaviest_task=false
+
+# --- Proteção contra thrashing ---
+# % do tempo que o sistema pode ficar em thrashing antes de escalar kills
+ro.lmk.thrashing_limit=100
+ro.lmk.thrashing_limit_decay=10
+
+# --- Limite de uso de swap ---
+# Quando o swap ultrapassa este % de uso, lmkd começa a matar mais agressivamente
+ro.lmk.swap_util_max=90
+
+# --- Pressão para upgrade/downgrade de nível ---
+# Define sensibilidade da transição entre níveis de pressão
+ro.lmk.upgrade_pressure=100
+ro.lmk.downgrade_pressure=250
+
+# --- Debug (desative em produção) ---
+# ro.lmk.debug=false
