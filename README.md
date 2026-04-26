@@ -112,7 +112,7 @@ In Stability and Default profiles a background PSI monitor runs every 60 seconds
 
 - Android 8.0 or higher
 - [Magisk](https://github.com/topjohnwu/Magisk) 20.4+ or [KernelSU](https://github.com/tiann/KernelSU)
-- [MMRL](https://github.com/DerGoogler/MMRL) or any compatible module manager
+- [KSU WebUI](https://github.com/adivenxnataly/KsuWebUI/releases/download/1.0-11/KsuWebUI-1.0-11-release.apk) or any compatible module manager
 
 ---
 
