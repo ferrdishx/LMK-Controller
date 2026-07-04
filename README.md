@@ -222,12 +222,13 @@ LMK-Controller/
 ├── webroot/
 │   └── index.html
 ├── module.prop
+├── system.prop
 ├── install.sh
 ├── uninstall.sh
 ├── lmk_boot.sh
 ├── post-fs-data.sh
 ├── service.sh
-└── logo.png
+└── Icon.png
 ```
 
 ---
