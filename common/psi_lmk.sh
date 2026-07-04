@@ -53,51 +53,138 @@ get_total_ram_mb() {
     awk '/MemTotal/ { print int($2 / 1024) }' /proc/meminfo
 }
 
+_ram_tier() {
+    local ram_mb
+    ram_mb=$(get_total_ram_mb)
+
+    if [ "$ram_mb" -lt 3072 ]; then
+        echo "low"
+    elif [ "$ram_mb" -lt 5120 ]; then
+        echo "mid"
+    else
+        echo "high"
+    fi
+}
+
 apply_psi_props_gamer() {
-    psi_info "Applying PSI props - gamer mode"
+    local tier
+    tier=$(_ram_tier)
+    psi_info "Applying PSI props - gamer mode (tier=$tier)"
+
+    case "$tier" in
+        low)
+            resetprop ro.lmk.psi_partial_stall_ms  35
+            resetprop ro.lmk.psi_complete_stall_ms 300
+            resetprop ro.lmk.thrashing_limit       20
+            resetprop ro.lmk.swap_util_max         70
+            resetprop ro.lmk.low                   0
+            resetprop ro.lmk.medium                150
+            resetprop ro.lmk.critical              70
+            ;;
+        mid)
+            resetprop ro.lmk.psi_partial_stall_ms  50
+            resetprop ro.lmk.psi_complete_stall_ms 400
+            resetprop ro.lmk.thrashing_limit       30
+            resetprop ro.lmk.swap_util_max         80
+            resetprop ro.lmk.low                   0
+            resetprop ro.lmk.medium                200
+            resetprop ro.lmk.critical              100
+            ;;
+        high)
+            resetprop ro.lmk.psi_partial_stall_ms  70
+            resetprop ro.lmk.psi_complete_stall_ms 500
+            resetprop ro.lmk.thrashing_limit        40
+            resetprop ro.lmk.swap_util_max          85
+            resetprop ro.lmk.low                    0
+            resetprop ro.lmk.medium                 300
+            resetprop ro.lmk.critical               150
+            ;;
+    esac
+
     resetprop ro.lmk.use_psi                 true
     resetprop ro.lmk.use_minfree_levels      false
-    resetprop ro.lmk.psi_partial_stall_ms    50
-    resetprop ro.lmk.psi_complete_stall_ms   400
     resetprop ro.lmk.kill_heaviest_task      true
-    resetprop ro.lmk.thrashing_limit         30
     resetprop ro.lmk.thrashing_limit_decay   5
-    resetprop ro.lmk.swap_util_max           80
-    resetprop ro.lmk.low                     0
-    resetprop ro.lmk.medium                  200
-    resetprop ro.lmk.critical                100
     _reinit_lmkd
 }
 
 apply_psi_props_stable() {
-    psi_info "Applying PSI props - stable mode"
+    local tier
+    tier=$(_ram_tier)
+    psi_info "Applying PSI props - stable mode (tier=$tier)"
+
+    case "$tier" in
+        low)
+            resetprop ro.lmk.psi_partial_stall_ms  55
+            resetprop ro.lmk.psi_complete_stall_ms 400
+            resetprop ro.lmk.swap_util_max         85
+            resetprop ro.lmk.low                   1001
+            resetprop ro.lmk.medium                700
+            resetprop ro.lmk.critical              600
+            ;;
+        mid)
+            resetprop ro.lmk.psi_partial_stall_ms  70
+            resetprop ro.lmk.psi_complete_stall_ms 500
+            resetprop ro.lmk.swap_util_max         90
+            resetprop ro.lmk.low                   1001
+            resetprop ro.lmk.medium                900
+            resetprop ro.lmk.critical              800
+            ;;
+        high)
+            resetprop ro.lmk.psi_partial_stall_ms  90
+            resetprop ro.lmk.psi_complete_stall_ms 600
+            resetprop ro.lmk.swap_util_max         95
+            resetprop ro.lmk.low                   1001
+            resetprop ro.lmk.medium                1100
+            resetprop ro.lmk.critical              1000
+            ;;
+    esac
+
     resetprop ro.lmk.use_psi                 true
     resetprop ro.lmk.use_minfree_levels      false
-    resetprop ro.lmk.psi_partial_stall_ms    70
-    resetprop ro.lmk.psi_complete_stall_ms   500
     resetprop ro.lmk.kill_heaviest_task      false
     resetprop ro.lmk.thrashing_limit         100
     resetprop ro.lmk.thrashing_limit_decay   10
-    resetprop ro.lmk.swap_util_max           90
-    resetprop ro.lmk.low                     1001
-    resetprop ro.lmk.medium                  900
-    resetprop ro.lmk.critical                800
     _reinit_lmkd
 }
 
 apply_psi_props_normal() {
-    psi_info "Applying PSI props - normal mode"
+    local tier
+    tier=$(_ram_tier)
+    psi_info "Applying PSI props - normal mode (tier=$tier)"
+
+    case "$tier" in
+        low)
+            resetprop ro.lmk.psi_partial_stall_ms  80
+            resetprop ro.lmk.psi_complete_stall_ms 600
+            resetprop ro.lmk.swap_util_max         90
+            resetprop ro.lmk.low                   1001
+            resetprop ro.lmk.medium                600
+            resetprop ro.lmk.critical              0
+            ;;
+        mid)
+            resetprop ro.lmk.psi_partial_stall_ms  100
+            resetprop ro.lmk.psi_complete_stall_ms 700
+            resetprop ro.lmk.swap_util_max         95
+            resetprop ro.lmk.low                   1001
+            resetprop ro.lmk.medium                800
+            resetprop ro.lmk.critical              0
+            ;;
+        high)
+            resetprop ro.lmk.psi_partial_stall_ms  120
+            resetprop ro.lmk.psi_complete_stall_ms 800
+            resetprop ro.lmk.swap_util_max         98
+            resetprop ro.lmk.low                   1001
+            resetprop ro.lmk.medium                1000
+            resetprop ro.lmk.critical              0
+            ;;
+    esac
+
     resetprop ro.lmk.use_psi                 true
     resetprop ro.lmk.use_minfree_levels      false
-    resetprop ro.lmk.psi_partial_stall_ms    100
-    resetprop ro.lmk.psi_complete_stall_ms   700
     resetprop ro.lmk.kill_heaviest_task      true
     resetprop ro.lmk.thrashing_limit         100
     resetprop ro.lmk.thrashing_limit_decay   10
-    resetprop ro.lmk.swap_util_max           95
-    resetprop ro.lmk.low                     1001
-    resetprop ro.lmk.medium                  800
-    resetprop ro.lmk.critical                0
     _reinit_lmkd
 }
 
@@ -301,6 +388,56 @@ stop_psi_swappiness_monitor() {
         local pid
         pid=$(cat "$pid_file" 2>/dev/null)
         kill "$pid" 2>/dev/null && psi_info "PSI monitor stopped (pid $pid)"
+        rm -f "$pid_file"
+    fi
+}
+
+WHITELIST_FILE="/data/adb/modules/lmk_controller_feerd/whitelist"
+
+apply_whitelist_protection() {
+    [ -f "$WHITELIST_FILE" ] || return 0
+
+    local pkg pid
+    while IFS= read -r pkg; do
+        [ -z "$pkg" ] && continue
+        case "$pkg" in \#*) continue ;; esac
+
+        for pid in $(pgrep -f "^$pkg\$" 2>/dev/null); do
+            if [ -f "/proc/$pid/oom_score_adj" ]; then
+                echo -1000 > "/proc/$pid/oom_score_adj" 2>/dev/null && \
+                    psi_info "Whitelist: pinned $pkg (pid $pid) to oom_score_adj -1000"
+            fi
+        done
+    done < "$WHITELIST_FILE"
+}
+
+start_whitelist_monitor() {
+    local interval="${1:-20}"
+    local pid_file="/data/adb/lmk_controller/whitelist_monitor.pid"
+
+    if [ -f "$pid_file" ]; then
+        local old_pid
+        old_pid=$(cat "$pid_file" 2>/dev/null)
+        kill -0 "$old_pid" 2>/dev/null && kill "$old_pid" 2>/dev/null
+    fi
+
+    (
+        while true; do
+            apply_whitelist_protection
+            sleep "$interval"
+        done
+    ) &
+
+    echo "$!" > "$pid_file"
+    psi_info "Whitelist monitor started with PID $! (interval=${interval}s)"
+}
+
+stop_whitelist_monitor() {
+    local pid_file="/data/adb/lmk_controller/whitelist_monitor.pid"
+    if [ -f "$pid_file" ]; then
+        local pid
+        pid=$(cat "$pid_file" 2>/dev/null)
+        kill "$pid" 2>/dev/null && psi_info "Whitelist monitor stopped (pid $pid)"
         rm -f "$pid_file"
     fi
 }
