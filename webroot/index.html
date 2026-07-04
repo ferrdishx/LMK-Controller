@@ -69,15 +69,7 @@
     .logo-mark span:nth-child(3) { opacity: 0.5; }
     .logo-mark span:nth-child(4) { opacity: 0.25; }
 
-<<<<<<< HEAD
-    .ver {
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-=======
     .ver { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
->>>>>>> 335ec37 (new files)
 
     main {
       flex: 1;
@@ -104,43 +96,22 @@
     .status.active-green { border-color: rgba(34,197,94,0.3); }
     .status.active-blue  { border-color: rgba(59,130,246,0.3); }
 
-<<<<<<< HEAD
-    .status-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-=======
     .status-left { display: flex; align-items: center; gap: 8px; }
 
     .dot {
       width: 6px; height: 6px; border-radius: 50%;
->>>>>>> 335ec37 (new files)
       background: var(--green);
       transition: background 0.3s, box-shadow 0.3s;
     }
 
-<<<<<<< HEAD
-    .dot.red  { background: var(--red);    box-shadow: 0 0 6px var(--red); }
-    .dot.green{ background: var(--green);  box-shadow: 0 0 6px var(--green); }
-    .dot.blue { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-=======
     .dot.red   { background: var(--red);    box-shadow: 0 0 6px var(--red); }
     .dot.green { background: var(--green);  box-shadow: 0 0 6px var(--green); }
     .dot.blue  { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
     .dot.amber { background: var(--amber);  box-shadow: 0 0 6px var(--amber); }
->>>>>>> 335ec37 (new files)
 
     .status-label { font-size: 11px; color: var(--muted); }
     .status-value { font-size: 11px; color: var(--text); letter-spacing: 0.06em; }
 
-<<<<<<< HEAD
-=======
     .kernel-badge {
       display: inline-flex;
       align-items: center;
@@ -163,7 +134,6 @@
       background: currentColor;
     }
 
->>>>>>> 335ec37 (new files)
     .label {
       font-size: 10px;
       color: var(--muted);
@@ -172,15 +142,7 @@
       margin-bottom: 8px;
     }
 
-<<<<<<< HEAD
-    .modes {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-=======
     .modes { display: flex; flex-direction: column; gap: 4px; }
->>>>>>> 335ec37 (new files)
 
     .mode {
       display: flex;
@@ -193,11 +155,6 @@
       transition: border-color 0.25s, background 0.25s;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-<<<<<<< HEAD
-      position: relative;
-      overflow: hidden;
-=======
->>>>>>> 335ec37 (new files)
     }
 
     .mode:hover { background: var(--surface); }
@@ -205,23 +162,11 @@
     .mode.sel-gamer  { border-color: rgba(239,68,68,0.4);  background: rgba(239,68,68,0.04); }
     .mode.sel-stable { border-color: rgba(34,197,94,0.4);  background: rgba(34,197,94,0.04); }
     .mode.sel-normal { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.04); }
-<<<<<<< HEAD
-    .mode.sel-extreme{ border-color: rgba(168,85,247,0.45); background: rgba(168,85,247,0.08); }
-
-    .mode-ico {
-      width: 32px;
-      height: 32px;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-=======
 
     .mode-ico {
       width: 32px; height: 32px;
       border-radius: 5px;
       display: flex; align-items: center; justify-content: center;
->>>>>>> 335ec37 (new files)
       flex-shrink: 0;
       font-size: 15px;
       background: var(--dim);
@@ -232,12 +177,7 @@
     .mode-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
 
     .radio {
-<<<<<<< HEAD
-      width: 14px;
-      height: 14px;
-=======
       width: 14px; height: 14px;
->>>>>>> 335ec37 (new files)
       border-radius: 50%;
       border: 1px solid var(--dim);
       flex-shrink: 0;
@@ -247,16 +187,6 @@
     .mode.sel-gamer  .radio { border-color: var(--red);    background: var(--red);    box-shadow: 0 0 8px rgba(239,68,68,0.5); }
     .mode.sel-stable .radio { border-color: var(--green);  background: var(--green);  box-shadow: 0 0 8px rgba(34,197,94,0.5); }
     .mode.sel-normal .radio { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 8px rgba(59,130,246,0.5); }
-<<<<<<< HEAD
-    .mode.sel-extreme .radio { border-color: #a855f7; background: #a855f7; box-shadow: 0 0 8px rgba(168,85,247,0.5); }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(6,1fr);
-      gap: 4px;
-    }
-
-=======
 
     .grid {
       display: grid;
@@ -266,7 +196,6 @@
 
     .grid.six-col { grid-template-columns: repeat(6,1fr); }
 
->>>>>>> 335ec37 (new files)
     .cell {
       border: 1px solid var(--border);
       border-radius: 4px;
@@ -299,23 +228,87 @@
     .apply:disabled { opacity: 0.35; cursor: not-allowed; }
     .apply.ok { background: var(--green); }
 
-<<<<<<< HEAD
-    .log-box {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-    }
+    .dash { border: 1px solid var(--border); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
 
-    .log-head {
+    .dash-row { display: flex; flex-direction: column; gap: 5px; }
+    .dash-top { display: flex; align-items: baseline; justify-content: space-between; }
+    .dash-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .dash-val { font-size: 11px; color: var(--text); }
+
+    .bar-track { height: 6px; border-radius: 3px; background: var(--dim); overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease, background 0.4s ease; background: var(--accent); }
+    .bar-fill.warn { background: var(--amber); }
+    .bar-fill.danger { background: var(--red); }
+
+    .kill-box { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .kill-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    .kill-refresh { font-size: 10px; color: var(--accent); cursor: pointer; letter-spacing: 0.04em; }
+    #killLog { padding: 10px 12px; min-height: 48px; max-height: 130px; overflow-y: auto; }
+    .kill-line { display: flex; gap: 10px; font-size: 10px; line-height: 1.9; }
+    .kill-empty { font-size: 10px; color: var(--muted); }
+
+    .wl-box { border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .wl-add { display: flex; gap: 8px; }
+    .wl-input {
+      flex: 1;
+      background: var(--dim);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      padding: 9px 10px;
+    }
+    .wl-input:focus { outline: none; border-color: var(--accent); }
+    .wl-add-btn {
+      padding: 9px 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-family: var(--font);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .wl-add-btn:active { opacity: 0.7; }
+    .wl-list { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; }
+    .wl-item {
       display: flex;
       align-items: center;
-      gap: 6px;
-=======
+      justify-content: space-between;
+      background: var(--dim);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: 10px;
+    }
+    .wl-item-name { color: var(--text); word-break: break-all; }
+    .wl-item-rm { color: var(--red); cursor: pointer; padding: 0 4px; font-size: 13px; }
+    .wl-empty { font-size: 10px; color: var(--muted); text-align: center; padding: 6px 0; }
+    .wl-hint { font-size: 9px; color: var(--muted); line-height: 1.5; }
+
+    .reset-btn {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      color: var(--red);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 6px;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .reset-btn:hover { background: rgba(239,68,68,0.08); }
+    .reset-btn:active { opacity: 0.7; }
+
     .log-box { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
 
     .log-head {
       display: flex; align-items: center; gap: 6px;
->>>>>>> 335ec37 (new files)
       padding: 8px 12px;
       border-bottom: 1px solid var(--border);
     }
@@ -330,27 +323,12 @@
       overflow-y: auto;
     }
 
-<<<<<<< HEAD
-    .log-line {
-      display: flex;
-      gap: 10px;
-      font-size: 10px;
-      line-height: 1.9;
-    }
-
-    .lt { color: var(--dim); flex-shrink: 0; }
-    .lm { color: var(--muted); }
-    .lm.ok  { color: var(--green); }
-    .lm.err { color: var(--red); }
-    .lm.warn{ color: var(--amber); }
-=======
     .log-line { display: flex; gap: 10px; font-size: 10px; line-height: 1.9; }
     .lt { color: var(--dim); flex-shrink: 0; }
     .lm { color: var(--muted); }
     .lm.ok   { color: var(--green); }
     .lm.err  { color: var(--red); }
     .lm.warn { color: var(--amber); }
->>>>>>> 335ec37 (new files)
 
     footer {
       padding: 16px 20px;
@@ -374,23 +352,11 @@
     </div>
     LMK Controller
   </div>
-<<<<<<< HEAD
-  <span class="ver">v1.2-beta</span>
-=======
-  <span class="ver">v1.3</span>
->>>>>>> 335ec37 (new files)
+  <span class="ver">v1.4</span>
 </header>
 
 <main>
 
-<<<<<<< HEAD
-  <div class="status" id="statusBar">
-    <div class="status-left">
-      <div class="dot green" id="dot"></div>
-      <span class="status-label">active mode</span>
-    </div>
-    <span class="status-value" id="statusVal">STABILITY</span>
-=======
   <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
     <div class="status" id="statusBar" style="flex:1;">
       <div class="status-left">
@@ -403,23 +369,11 @@
       <div class="kb-dot"></div>
       <span id="kernelLabel">detecting...</span>
     </div>
->>>>>>> 335ec37 (new files)
   </div>
 
   <div>
     <div class="label">Mode</div>
     <div class="modes">
-<<<<<<< HEAD
-      <div class="mode" id="card-gamer" onclick="pick('gamer',event)">
-        <div class="mode-ico">⚡</div>
-        <div class="mode-body">
-          <div class="mode-name">Performance</div>
-          <div class="mode-desc">Zeros all thresholds. Max RAM for the foreground app.</div>
-        </div>
-        <div class="radio" id="r-gamer"></div>
-      </div>
-      <div class="mode sel-stable" id="card-stable" onclick="pick('stable',event)">
-=======
       <div class="mode" id="card-gamer" onclick="pick('gamer')">
         <div class="mode-ico">⚡</div>
         <div class="mode-body">
@@ -429,7 +383,6 @@
         <div class="radio" id="r-gamer"></div>
       </div>
       <div class="mode sel-stable" id="card-stable" onclick="pick('stable')">
->>>>>>> 335ec37 (new files)
         <div class="mode-ico">🌿</div>
         <div class="mode-body">
           <div class="mode-name">Stability</div>
@@ -437,30 +390,6 @@
         </div>
         <div class="radio" id="r-stable"></div>
       </div>
-<<<<<<< HEAD
-      <div class="mode" id="card-normal" onclick="pick('normal',event)">
-        <div class="mode-ico">🔵</div>
-        <div class="mode-body">
-          <div class="mode-name">Default</div>
-          <div class="mode-desc">Near stock AOSP values. Restores OEM baseline.</div>
-        </div>
-        <div class="radio" id="r-normal"></div>
-      </div>
-      <div class="mode" id="card-extreme" onclick="pick('extreme',event)">
-        <div class="mode-ico">🔥</div>
-        <div class="mode-body">
-          <div class="mode-name">EXTREME</div>
-          <div class="mode-desc">LMKD-only multitasking boost. Higher RAM pressure may cause lag/UI slowdown.</div>
-        </div>
-        <div class="radio" id="r-extreme"></div>
-      </div>
-    </div>
-  </div>
-
-  <div>
-    <div class="label">minfree thresholds (pages)</div>
-    <div class="grid">
-=======
       <div class="mode" id="card-normal" onclick="pick('normal')">
         <div class="mode-ico">🔵</div>
         <div class="mode-body">
@@ -475,7 +404,6 @@
   <div id="gridSection">
     <div class="label" id="gridLabel">minfree thresholds (pages)</div>
     <div class="grid six-col" id="grid">
->>>>>>> 335ec37 (new files)
       <div class="cell"><div class="cell-lbl">FORE</div><div class="cell-val" id="v0">1024</div></div>
       <div class="cell"><div class="cell-lbl">VIS</div><div class="cell-val" id="v1">2048</div></div>
       <div class="cell"><div class="cell-lbl">SEC</div><div class="cell-val" id="v2">4096</div></div>
@@ -485,11 +413,58 @@
     </div>
   </div>
 
-<<<<<<< HEAD
-  <button class="apply" id="applyBtn" onclick="apply(event)">Apply Settings</button>
-=======
   <button class="apply" id="applyBtn" onclick="applyMode()">Apply Settings</button>
->>>>>>> 335ec37 (new files)
+
+  <div>
+    <div class="label">System Dashboard</div>
+    <div class="dash">
+      <div class="dash-row">
+        <div class="dash-top">
+          <span class="dash-lbl">RAM</span>
+          <span class="dash-val" id="ramVal">-- / --</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="ramBar" style="width:0%"></div></div>
+      </div>
+      <div class="dash-row">
+        <div class="dash-top">
+          <span class="dash-lbl">ZRAM</span>
+          <span class="dash-val" id="zramVal">-- / --</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="zramBar" style="width:0%"></div></div>
+      </div>
+      <div class="dash-row">
+        <div class="dash-top">
+          <span class="dash-lbl">Swappiness</span>
+          <span class="dash-val" id="swapVal">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Recent LMK Kills</div>
+    <div class="kill-box">
+      <div class="kill-head">
+        <span class="log-head-lbl">logcat | grep lmkd</span>
+        <span class="kill-refresh" onclick="refreshKills()">refresh</span>
+      </div>
+      <div id="killLog"><div class="kill-empty">No kills detected yet.</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Whitelist (never kill)</div>
+    <div class="wl-box">
+      <div class="wl-add">
+        <input class="wl-input" id="wlInput" type="text" placeholder="com.example.package" autocapitalize="none" autocorrect="off"/>
+        <button class="wl-add-btn" onclick="addWhitelistPackage()">Add</button>
+      </div>
+      <div class="wl-list" id="wlList"></div>
+      <div class="wl-hint">Protected apps get oom_score_adj -1000 re-applied every ~20s by a background monitor. Takes effect without reboot.</div>
+    </div>
+  </div>
+
+  <button class="reset-btn" id="resetBtn" onclick="resetToStock()">Reset to Stock</button>
 
   <div class="log-box">
     <div class="log-head">
@@ -508,41 +483,11 @@
 
 <footer>
   <span>LMK Controller / Low Memory Killer Optimizer</span>
-  <span>by feerd</span>
+  <span>by ferrdishx</span>
 </footer>
 
 <script>
   const MODES = {
-<<<<<<< HEAD
-    gamer:  { values:[0,0,0,0,0,0],                    label:'PERFORMANCE', dot:'red',   status:'active-red'   },
-    stable: { values:[1024,2048,4096,8192,12288,16384], label:'STABILITY',   dot:'green', status:'active-green' },
-    normal: { values:[4096,5120,6144,7168,8192,9216],   label:'DEFAULT',     dot:'blue',  status:'active-blue'  },
-    extreme:{ values:[0,0,0,0,0,0],                    label:'EXTREME',      dot:'red',   status:'active-red'   },
-  };
-
-  const CMDS_CLASSIC = {
-    gamer:  "echo 0,0,0,0,0,0 > /sys/module/lowmemorykiller/parameters/minfree && setprop sys.lmk.minfree_levels 0:0,0:0,0:0,0:0,0:0,0:0",
-    stable: "echo 1024,2048,4096,8192,12288,16384 > /sys/module/lowmemorykiller/parameters/minfree && setprop ro.lmk.low 1001 && setprop sys.lmk.minfree_levels 1024:0,2048:100,4096:200,8192:250,12288:900,16384:950",
-    normal: "echo 4096,5120,6144,7168,8192,9216 > /sys/module/lowmemorykiller/parameters/minfree",
-    extreme:"echo 0,0,0,0,0,0 > /sys/module/lowmemorykiller/parameters/minfree && setprop sys.lmk.minfree_levels 0:0,0:0,0:0,0:0,0:0,0:0",
-  };
-
-  const CMDS_LMKD = {
-    gamer:  "resetprop ro.lmk.low 970 && resetprop ro.lmk.medium 920 && resetprop ro.lmk.critical 860 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 45 && resetprop ro.lmk.thrashing_limit_decay 55 && resetprop ro.lmk.swap_util_max 95 && stop lmkd && start lmkd",
-    stable: "resetprop ro.lmk.low 1001 && resetprop ro.lmk.medium 950 && resetprop ro.lmk.critical 900 && resetprop ro.lmk.kill_heaviest_task false && resetprop ro.lmk.thrashing_limit 100 && resetprop ro.lmk.thrashing_limit_decay 80 && resetprop ro.lmk.swap_util_max 80 && stop lmkd && start lmkd",
-    normal: "resetprop ro.lmk.low 990 && resetprop ro.lmk.medium 930 && resetprop ro.lmk.critical 880 && resetprop ro.lmk.kill_heaviest_task true && resetprop ro.lmk.thrashing_limit 70 && resetprop ro.lmk.thrashing_limit_decay 65 && resetprop ro.lmk.swap_util_max 90 && stop lmkd && start lmkd",
-    extreme:"echo 100 > /proc/sys/vm/swappiness && resetprop ro.lmk.low 980 && resetprop ro.lmk.medium 930 && resetprop ro.lmk.critical 870 && resetprop ro.lmk.kill_heaviest_task false && resetprop ro.lmk.thrashing_limit 80 && resetprop ro.lmk.thrashing_limit_decay 90 && resetprop ro.lmk.swap_util_max 100 && stop lmkd && start lmkd",
-  };
-
-  const CONFIG = '/data/adb/modules/lmk_controller_feerd/lmk_mode';
-
-  let current = 'stable';
-  let isLMKD  = false;
-
-  const now = () => new Date().toTimeString().slice(0,8);
-
-  function log(msg, cls='') {
-=======
     gamer:  { label: 'PERFORMANCE', dot: 'red',   status: 'active-red'   },
     stable: { label: 'STABILITY',   dot: 'green',  status: 'active-green' },
     normal: { label: 'DEFAULT',     dot: 'blue',   status: 'active-blue'  },
@@ -563,6 +508,7 @@
   const CONFIG = '/data/adb/modules/lmk_controller_feerd/lmk_mode';
   const LMK_NODE = '/sys/module/lowmemorykiller/parameters/minfree';
   const PSI_NODE = '/proc/pressure/memory';
+  const WHITELIST_FILE = '/data/adb/modules/lmk_controller_feerd/whitelist';
 
   let current  = 'stable';
   let kernelType = 'unknown'; // 'psi_lmkd' | 'legacy_lmkd' | 'classic_lmk'
@@ -570,7 +516,6 @@
   const now = () => new Date().toTimeString().slice(0, 8);
 
   function log(msg, cls = '') {
->>>>>>> 335ec37 (new files)
     const el = document.getElementById('log');
     const ln = document.createElement('div');
     ln.className = 'log-line';
@@ -579,9 +524,6 @@
     el.scrollTop = el.scrollHeight;
   }
 
-<<<<<<< HEAD
-  function pick(mode, e) {
-=======
   function exec(cmd) {
     if (typeof ksu !== 'undefined' && ksu.exec) return ksu.exec(cmd).trim();
     return '';
@@ -626,51 +568,19 @@
   }
 
   function pick(mode) {
->>>>>>> 335ec37 (new files)
     if (mode === current) return;
     current = mode;
     const m = MODES[mode];
 
-<<<<<<< HEAD
-    ['gamer','stable','normal','extreme'].forEach(k => {
-      document.getElementById('card-'+k).className = 'mode';
-    });
-
-    document.getElementById('card-'+mode).className = 'mode sel-'+mode;
-=======
     ['gamer','stable','normal'].forEach(k => {
       document.getElementById('card-' + k).className = 'mode';
     });
 
     document.getElementById('card-' + mode).className = 'mode sel-' + mode;
->>>>>>> 335ec37 (new files)
     document.getElementById('dot').className = 'dot ' + m.dot;
     document.getElementById('statusVal').textContent = m.label;
     document.getElementById('statusBar').className = 'status ' + m.status;
 
-<<<<<<< HEAD
-    m.values.forEach((v, i) => {
-      setTimeout(() => {
-        document.getElementById('v'+i).textContent = isLMKD ? '-' : v;
-      }, i * 30);
-    });
-
-    log('Mode selected \u2192 ' + m.label);
-  }
-
-  function apply(e) {
-    const btn = document.getElementById('applyBtn');
-
-    btn.disabled = true;
-    btn.textContent = 'Applying...';
-    if (!isLMKD && current === 'extreme') {
-      log('EXTREME is LMKD-only, falling back to PERFORMANCE on LMK.', 'warn');
-      pick('gamer', null);
-    }
-    const cmds = isLMKD ? CMDS_LMKD : CMDS_CLASSIC;
-    const cmd     = "su -c '" + cmds[current] + "'";
-    const saveCmd = "su -c 'echo " + current + " > " + CONFIG + "'";
-=======
     updateGrid(mode);
     log('Mode selected \u2192 ' + m.label);
   }
@@ -711,24 +621,15 @@
     log('Executing ' + kernelType + ' commands...', 'warn');
 
     const cmd = `su -c '${buildApplyCmd(current)}'`;
->>>>>>> 335ec37 (new files)
 
     if (typeof ksu !== 'undefined' && ksu.exec) {
       try {
         ksu.exec(cmd);
-<<<<<<< HEAD
-        ksu.exec(saveCmd);
-=======
->>>>>>> 335ec37 (new files)
         log('Applied. Will persist on reboot.', 'ok');
         btn.textContent = 'Applied';
         btn.classList.add('ok');
         setTimeout(() => { btn.classList.remove('ok'); btn.disabled = false; btn.textContent = 'Apply Settings'; }, 1800);
-<<<<<<< HEAD
-      } catch(err) {
-=======
       } catch (err) {
->>>>>>> 335ec37 (new files)
         log('Error: ' + err.message, 'err');
         btn.disabled = false;
         btn.textContent = 'Apply Settings';
@@ -743,24 +644,205 @@
     }
   }
 
-<<<<<<< HEAD
-  function init() {
+  function barClass(pct) {
+    if (pct >= 85) return 'bar-fill danger';
+    if (pct >= 60) return 'bar-fill warn';
+    return 'bar-fill';
+  }
+
+  function refreshDashboard() {
+    if (typeof ksu === 'undefined' || !ksu.exec) {
+      if (!window._ksuWarnLogged) {
+        log('ksu bridge not found (dev preview mode?)', 'warn');
+        window._ksuWarnLogged = true;
+      }
+      return;
+    }
+
+    try {
+      const totalRaw = exec("awk '/^MemTotal:/{print $2}' /proc/meminfo");
+      const availRaw = exec("awk '/^MemAvailable:/{print $2}' /proc/meminfo");
+
+      if (totalRaw && availRaw && /^\d+$/.test(totalRaw) && /^\d+$/.test(availRaw)) {
+        const totalMB = Math.round(parseInt(totalRaw) / 1024);
+        const availMB = Math.round(parseInt(availRaw) / 1024);
+        const usedMB = totalMB - availMB;
+        const pct = Math.round((usedMB / totalMB) * 100);
+
+        document.getElementById('ramVal').textContent = `${usedMB}MB / ${totalMB}MB`;
+        const ramBar = document.getElementById('ramBar');
+        ramBar.style.width = pct + '%';
+        ramBar.className = barClass(pct);
+      } else {
+        document.getElementById('ramVal').textContent = 'read error';
+        if (!window._ramErrLogged) {
+          log(`RAM parse failed, got total="${totalRaw}" avail="${availRaw}"`, 'err');
+          window._ramErrLogged = true;
+        }
+      }
+    } catch (e) {
+      document.getElementById('ramVal').textContent = 'read error';
+      if (!window._ramErrLogged) {
+        log(`RAM exec threw: ${e.message}`, 'err');
+        window._ramErrLogged = true;
+      }
+    }
+
+    try {
+      const zramTotal = exec("cat /sys/block/zram0/disksize 2>/dev/null");
+      const zramUsed = exec("cat /sys/block/zram0/mem_used_total 2>/dev/null");
+
+      if (zramTotal && zramUsed && zramTotal !== '0') {
+        const totalMB = Math.round(parseInt(zramTotal) / 1024 / 1024);
+        const usedMB = Math.round(parseInt(zramUsed) / 1024 / 1024);
+        const pct = totalMB > 0 ? Math.round((usedMB / totalMB) * 100) : 0;
+
+        document.getElementById('zramVal').textContent = `${usedMB}MB / ${totalMB}MB`;
+        const zramBar = document.getElementById('zramBar');
+        zramBar.style.width = pct + '%';
+        zramBar.className = barClass(pct);
+      } else {
+        document.getElementById('zramVal').textContent = 'unavailable';
+      }
+    } catch (e) {}
+
+    try {
+      const swap = exec("cat /proc/sys/vm/swappiness 2>/dev/null");
+      document.getElementById('swapVal').textContent = swap || '--';
+    } catch (e) {}
+  }
+
+  function refreshKills() {
+    if (typeof ksu === 'undefined' || !ksu.exec) return;
+
+    const box = document.getElementById('killLog');
+    try {
+      const raw = exec("logcat -d -t 300 | grep -i lmkd | grep \"Kill '\" | tail -n 15");
+
+      if (!raw || raw.trim() === '') {
+        box.innerHTML = '<div class="kill-empty">No kills detected yet.</div>';
+        return;
+      }
+
+      const lines = raw.trim().split('\n').slice(-15).reverse();
+      box.innerHTML = lines.map(l => {
+        const escaped = l.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<div class="kill-line"><span class="lm err">${escaped}</span></div>`;
+      }).join('');
+    } catch (e) {
+      box.innerHTML = '<div class="kill-empty">Unable to read logcat.</div>';
+    }
+  }
+
+  let whitelist = [];
+
+  function loadWhitelist() {
+    try {
+      const raw = exec(`cat ${WHITELIST_FILE} 2>/dev/null`);
+      whitelist = raw ? raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#')) : [];
+    } catch (e) {
+      whitelist = [];
+    }
+    renderWhitelist();
+  }
+
+  function renderWhitelist() {
+    const el = document.getElementById('wlList');
+    if (whitelist.length === 0) {
+      el.innerHTML = '<div class="wl-empty">No apps whitelisted yet.</div>';
+      return;
+    }
+    el.innerHTML = whitelist.map(pkg => {
+      const escaped = pkg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<div class="wl-item"><span class="wl-item-name">${escaped}</span><span class="wl-item-rm" onclick="removeWhitelistPackage('${escaped}')">✕</span></div>`;
+    }).join('');
+  }
+
+  function persistWhitelist() {
+    const content = whitelist.join('\n');
+    exec(`cat > ${WHITELIST_FILE} << 'LMKEOF'\n${content}\nLMKEOF`);
+  }
+
+  function addWhitelistPackage() {
+    const input = document.getElementById('wlInput');
+    const addBtn = document.querySelector('.wl-add-btn');
+    const pkg = input.value.trim();
+
+    if (!pkg) return;
+    if (!/^[a-zA-Z0-9_.]+$/.test(pkg)) {
+      log(`Invalid package name: ${pkg}`, 'err');
+      return;
+    }
+    if (whitelist.includes(pkg)) {
+      log(`${pkg} already whitelisted`, 'warn');
+      return;
+    }
+
+    addBtn.disabled = true;
+    addBtn.textContent = '...';
+
+    let installed = false;
+    try {
+      const result = exec(`pm path ${pkg} 2>/dev/null`);
+      installed = result && result.startsWith('package:');
+    } catch (e) {
+      installed = false;
+    }
+
+    addBtn.disabled = false;
+    addBtn.textContent = 'Add';
+
+    if (!installed) {
+      log(`${pkg} not found on this device`, 'err');
+      return;
+    }
+
+    whitelist.push(pkg);
+    persistWhitelist();
+    renderWhitelist();
+    input.value = '';
+    log(`Whitelisted: ${pkg}`, 'ok');
+  }
+
+  function removeWhitelistPackage(pkg) {
+    whitelist = whitelist.filter(p => p !== pkg);
+    persistWhitelist();
+    renderWhitelist();
+    log(`Removed from whitelist: ${pkg}`, 'warn');
+  }
+
+  function resetToStock() {
+    const btn = document.getElementById('resetBtn');
+    if (!confirm('Reset LMK Controller to stock system values? This clears your saved mode.')) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Resetting...';
+
+    const cmd = kernelType === 'psi_lmkd'
+      ? `resetprop --delete ro.lmk.use_psi; resetprop --delete ro.lmk.low; resetprop --delete ro.lmk.medium; resetprop --delete ro.lmk.critical; resetprop --delete ro.lmk.kill_heaviest_task; resetprop --delete ro.lmk.thrashing_limit; resetprop --delete ro.lmk.swap_util_max; resetprop --delete ro.lmk.psi_partial_stall_ms; resetprop --delete ro.lmk.psi_complete_stall_ms; echo 60 > /proc/sys/vm/swappiness; rm -f ${CONFIG}; resetprop lmkd.reinit 1 2>/dev/null || kill -HUP $(pidof lmkd) 2>/dev/null`
+      : kernelType === 'legacy_lmkd'
+      ? `resetprop --delete ro.lmk.low; resetprop --delete ro.lmk.medium; resetprop --delete ro.lmk.critical; resetprop --delete ro.lmk.kill_heaviest_task; resetprop --delete ro.lmk.thrashing_limit; echo 60 > /proc/sys/vm/swappiness; rm -f ${CONFIG}; kill -HUP $(pidof lmkd) 2>/dev/null`
+      : `echo 4096,5120,6144,7168,8192,9216 > ${LMK_NODE}; echo 60 > /proc/sys/vm/swappiness; rm -f ${CONFIG}`;
+
+    const full = `su -c '${cmd}'`;
+
     if (typeof ksu !== 'undefined' && ksu.exec) {
       try {
-        const check = ksu.exec("su -c '[ -f /system/bin/lmkd ] && echo lmkd'").trim();
-        isLMKD = check === 'lmkd';
-        log('Kernel: ' + (isLMKD ? 'LMKD' : 'Classic LMK'), 'ok');
-      } catch(e) {}
-
-      try {
-        const saved = ksu.exec("su -c 'cat " + CONFIG + " 2>/dev/null'").trim();
-        if (['gamer','stable','normal','extreme'].includes(saved) && saved !== current) {
-          pick(saved, null);
-          log('Restored \u2192 ' + MODES[saved].label, 'ok');
-        }
-      } catch(e) {}
+        ksu.exec(full);
+        log('Reset to stock values complete.', 'warn');
+        setTimeout(() => location.reload(), 1200);
+      } catch (err) {
+        log('Reset error: ' + err.message, 'err');
+        btn.disabled = false;
+        btn.textContent = 'Reset to Stock';
+      }
+    } else {
+      log('Reset (dev preview) — no ksu bridge.', 'warn');
+      btn.disabled = false;
+      btn.textContent = 'Reset to Stock';
     }
-=======
+  }
+
   function updateKernelBadge(type) {
     const badge = document.getElementById('kernelBadge');
     const label = document.getElementById('kernelLabel');
@@ -812,15 +894,21 @@
     }
 
     updateKernelBadge(kernelType);
->>>>>>> 335ec37 (new files)
+    refreshDashboard();
+    refreshKills();
+    loadWhitelist();
+    setInterval(refreshDashboard, 5000);
+
+    const wlInput = document.getElementById('wlInput');
+    if (wlInput) {
+      wlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addWhitelistPackage();
+      });
+    }
   }
 
   window.addEventListener('DOMContentLoaded', init);
 </script>
 
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> 335ec37 (new files)
