@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v1.3-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/version-v1.4-blue?style=flat-square" />
   <img src="https://img.shields.io/badge/platform-Magisk%20%7C%20KSU-orange?style=flat-square" />
   <img src="https://img.shields.io/badge/android-8.0%2B-green?style=flat-square&logo=android" />
   <img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square" />
@@ -100,6 +100,11 @@ In Stability and Default profiles a background PSI monitor runs every 60 seconds
 - 🌐 Clean WebUI accessible via MMRL
 - 🔁 Settings persist across every reboot via `service.d`
 - 🧠 Automatic kernel type detection at boot
+- 📊 Live RAM and ZRAM dashboard with kill log (`logcat | grep lmkd`)
+- 🎯 Whitelist system: protect chosen apps from being killed (`oom_score_adj -1000`), validated against real installed packages via `pm path`
+- 💾 Snapshot on install / full restore on uninstall — original system values are captured before any change and reverted automatically when the module is removed
+- 📈 RAM-aware scaling across all profiles, including PSI LMKD (previously Classic LMK only)
+- 🔄 Reset to Stock button in the WebUI for an instant manual revert
 - 📊 Dynamic swappiness monitor driven by real-time PSI readings
 - 🗜️ ZRAM compression algorithm selection per profile
 - 📜 Detailed boot log at `/data/adb/lmk_controller/service.log`
@@ -229,6 +234,22 @@ LMK-Controller/
 
 ## Changelog
 
+### [v1.4](https://github.com/ferrdishx/LMK-Controller/releases/tag/v1.4) — Jul 4, 2026
+
+**Added**
+
+- Live System Dashboard in the WebUI: real-time RAM usage, ZRAM usage and current swappiness, refreshed every 5 seconds
+- Recent Kills log: reads `logcat | grep lmkd` for actual LMK kill events, filtered on the exact `Kill '...'` pattern to avoid false positives from unrelated lmkd log lines
+- Whitelist system: protect specific apps from ever being killed by continuously reapplying `oom_score_adj -1000` to their process every ~20 seconds via a background monitor started at boot. Package names are validated against `pm path` before being accepted — non-existent packages are rejected with a visible error, they are never silently added
+- Snapshot and restore: on first install, the module captures the current values of swappiness, dirty_ratio, dirty_background_ratio, vfs_cache_pressure, minfree, ZRAM compression algorithm and all `ro.lmk.*` props to `/data/adb/lmk_controller/original_state.conf`. On uninstall, every value is restored exactly as found, then the snapshot is deleted
+- Reset to Stock button in the WebUI for an instant manual revert without uninstalling
+- RAM-aware scaling extended to PSI LMKD profiles (Gamer, Stable, Normal), previously only available on Classic LMK
+
+**Fixed**
+
+- RAM dashboard read failure caused by the KernelSU-Next WebView exec bridge truncating large command output. `/proc/meminfo` is no longer read in full; specific values are now isolated with `awk` before being returned, avoiding truncation entirely
+- Removed unreliable pipe usage (`cat | grep`) in dashboard exec calls, since not every exec bridge implementation guarantees pipe forwarding to the underlying shell
+
 ### [v1.3](https://github.com/ferrdishx/LMK-Controller/releases/tag/v1.3) — Apr 25, 2026
 
 **Fixed**
@@ -297,7 +318,7 @@ LMK-Controller/
 ---
 
 <p align="center">
-  Made by <strong>feerd</strong>
+  Made by <strong>ferrdishx</strong>
   &nbsp;·&nbsp;
   <a href="https://github.com/ferrdishx/LMK-Controller/releases/latest">Download</a>
   &nbsp;·&nbsp;
