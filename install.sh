@@ -7,7 +7,7 @@ print_modname() {
   ui_print "*******************************"
   ui_print "      LMK Controller           "
   ui_print "      Author: ferrdishx            "
-  ui_print "      Version: v1.4            "
+  ui_print "      Version: v1.4.1          "
   ui_print "*******************************"
 }
 
