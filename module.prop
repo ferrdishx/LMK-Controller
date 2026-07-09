@@ -1,7 +1,6 @@
 id=lmk_controller_feerd
 name=LMK Controller
-version=v1.4
-versionCode=4
+version=v1.4.1
+versionCode=5
 author=ferrdishx
 description=Total control over Low Memory Killer. Modes: Gamer, Stable, and Normal.
-updateJson=https://raw.githubusercontent.com/ferrdishx/LMK-Controller/main/update.json
