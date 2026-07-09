@@ -352,7 +352,7 @@
     </div>
     LMK Controller
   </div>
-  <span class="ver">v1.4</span>
+  <span class="ver">v1.4.1</span>
 </header>
 
 <main>
@@ -737,11 +737,18 @@
   let whitelist = [];
 
   function loadWhitelist() {
+    whitelist = [];
     try {
-      const raw = exec(`cat ${WHITELIST_FILE} 2>/dev/null`);
-      whitelist = raw ? raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#')) : [];
+      const countRaw = exec(`wc -l < ${WHITELIST_FILE} 2>/dev/null`);
+      const count = parseInt(countRaw) || 0;
+
+      for (let i = 1; i <= count; i++) {
+        const line = exec(`sed -n '${i}p' ${WHITELIST_FILE} 2>/dev/null`).trim();
+        if (line && !line.startsWith('#')) whitelist.push(line);
+      }
     } catch (e) {
       whitelist = [];
+      log(`Whitelist load failed: ${e.message}`, 'err');
     }
     renderWhitelist();
   }
